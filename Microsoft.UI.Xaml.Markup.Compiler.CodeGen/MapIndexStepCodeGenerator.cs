@@ -1,0 +1,22 @@
+namespace Microsoft.UI.Xaml.Markup.Compiler.CodeGen;
+
+internal class MapIndexStepCodeGenerator : BindPathStepCodeGenerator<MapIndexStep>
+{
+	public override ICodeGenOutput PathExpression
+	{
+		get
+		{
+			ICodeGenOutput parentPathExpression = base.Instance.Parent.CodeGen().PathExpression;
+			return new LanguageSpecificString(() => $"safe_cast<::Windows::Foundation::Collections::IMap<::Platform::String^, {base.Instance.ValueType.CppCXName()}>^>({parentPathExpression.CppCXName()})->Lookup(\"{base.Instance.Key}\")", () => string.Format("{1}.as<::winrt::Windows::Foundation::Collections::IMap<::winrt::hstring, {0}>>().Lookup(\"{2}\")", base.Instance.ValueType.CppWinRTName(), parentPathExpression.CppWinRTName(), base.Instance.Key), () => $"{parentPathExpression.CSharpName()}[\"{base.Instance.Key}\"]", () => $"{parentPathExpression.VBName()}(\"{base.Instance.Key}\")");
+		}
+	}
+
+	public override ICodeGenOutput UpdateCallParam => new LanguageSpecificString(() => "safe_cast<::Windows::Foundation::Collections::IMap<::Platform::String^, " + base.Instance.ValueType.CppCXName() + ">^>(obj)->Lookup(\"" + base.Instance.Key + "\")", () => "obj.as<::winrt::Windows::Foundation::Collections::IMap<::winrt::hstring, " + base.Instance.ValueType.CppWinRTName() + ">>().Lookup(L\"" + base.Instance.Key + "\")", () => string.Format("{0}[\"{1}\"]", "obj", base.Instance.Key), () => string.Format("{0}(\"{1}\")", "obj", base.Instance.Key));
+
+	public override ICodeGenOutput PathSetExpression(ICodeGenOutput value)
+	{
+		ICodeGenOutput pathExpression = base.Instance.CodeGen().PathExpression;
+		ICodeGenOutput parentPathExpression = base.Instance.Parent.CodeGen().PathExpression;
+		return new LanguageSpecificString(() => "safe_cast<::Windows::Foundation::Collections::IMap<::Platform::String^, " + base.Instance.ValueType.CppCXName() + ">^>(" + parentPathExpression.CppCXName() + ")->Insert(\"" + base.Instance.Key + "\", " + value.CppCXName() + ")", () => parentPathExpression.CppWinRTName() + ".as<::winrt::Windows::Foundation::Collections::IMap<::winrt::hstring, " + base.Instance.ValueType.CppWinRTName() + ">>().Insert(L\"" + base.Instance.Key + "\", " + value.CppWinRTName() + ")", () => pathExpression.CSharpName() + " = " + value.CSharpName(), () => pathExpression.VBName() + " = " + value.VBName());
+	}
+}

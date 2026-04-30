@@ -1,0 +1,53 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+<resheader name="resmimetype"><value>text/microsoft-resx</value></resheader><resheader name="version"><value>1.3</value></resheader><resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader><resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader><data name="SyntaxError" xml:space="preserve"><value>Syntax error at '{0}'.</value></data>
+  <data name="FunctionAsParameter" xml:space="preserve"><value>Functions cannot have other functions as parameters.</value></data>
+  <data name="ExpectingMethod" xml:space="preserve"><value>Expecting a method.</value></data>
+  <data name="TypeNotFound" xml:space="preserve"><value>Type '{0}' not found.</value></data>
+  <data name="ExpectingStaticProperty" xml:space="preserve"><value>Expecting '{0}' on type '{1}' to be a static property.</value></data>
+  <data name="MultipleNamespaceConditionalStatements" xml:space="preserve"><value>Multiple namespace conditional statements found.</value></data>
+  <data name="UsingNamedElement" xml:space="preserve"><value>Named element '{0}' also exists on root data type '{1}'. Using field from root data type.</value></data>
+  <data name="ExpectingDigit" xml:space="preserve"><value>Expecting a digit.</value></data>
+  <data name="MultipleTargetPlatforms" xml:space="preserve"><value>Multiple target platforms found.</value></data>
+  <data name="PropertyNotFound" xml:space="preserve"><value>Property '{0}' not found on type '{1}'.</value></data>
+  <data name="PropertyWithoutGet" xml:space="preserve"><value>Property '{0}' on type '{1}' does not have a 'get' accessor.</value></data>
+  <data name="UnrecognizedApiInformation" xml:space="preserve"><value>Unrecognized API information '{0}'.</value></data>
+  <data name="InvalidCast" xml:space="preserve"><value>Unable to cast type '{0}' to '{1}'.  Use a converter or function binding to change the type.</value></data>
+  <data name="FunctionNotLeaf" xml:space="preserve"><value>Functions are only supported at the end of the bind path.</value></data>
+  <data name="InvalidParameter" xml:space="preserve"><value>Invalid or missmatched parameter at position '{0}'.</value></data>
+  <data name="UnsuportedOutParameter" xml:space="preserve"><value>Unsuported ref/out parameter at position '{0}'.</value></data>
+  <data name="UnbindableMemberConflict" xml:space="preserve"><value>Named element '{0}' conflicts with an unbindable member on root data type '{1}'.</value></data>
+  <data name="MissmatchedParameterCount" xml:space="preserve"><value>Missmatched function parameter count.</value></data>
+  <data name="ExpectingStaticFunction" xml:space="preserve"><value>Expecting '{0}' on type '{1}' to be a static function.</value></data>
+  <data name="UnexpectedArrayIndexer" xml:space="preserve"><value>Unexpected array indexer.</value></data>
+  <data name="CastCannotStartWithAttachedProperty" xml:space="preserve"><value>Starting a cast with an Attached Property is not supported.  Try a syntax like: path.(owner.property).</value></data>
+  <data name="UnmatchedApiInformationParameters" xml:space="preserve"><value>Unmatched API information parameters for method '{0}'.</value></data>
+  <data name="NoMatchingOverload" xml:space="preserve"><value>Cannot find an overload that takes {0} parameters.</value></data>
+  </root>

@@ -1,0 +1,39 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <AssemblyName>XamlCompiler</AssemblyName>
+    <GenerateAssemblyInfo>False</GenerateAssemblyInfo>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net472</TargetFramework>
+  </PropertyGroup>
+  <PropertyGroup>
+    <LangVersion>14.0</LangVersion>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+    <CheckForOverflowUnderflow>False</CheckForOverflowUnderflow>
+  </PropertyGroup>
+  <PropertyGroup>
+    <RootNamespace />
+  </PropertyGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Core" />
+    <Reference Include="Microsoft.UI.Xaml.Markup.Compiler.MSBuildInterop">
+      <HintPath>..\..\..\Users\WanYa\.nuget\packages\microsoft.windowsappsdk.winui\1.8.260415005\tools\net472\Microsoft.UI.Xaml.Markup.Compiler.MSBuildInterop.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Memory">
+      <HintPath>..\..\..\Users\WanYa\.nuget\packages\microsoft.windowsappsdk.winui\1.8.260415005\tools\net472\System.Memory.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Reflection.Metadata">
+      <HintPath>..\..\..\Users\WanYa\.nuget\packages\microsoft.windowsappsdk.winui\1.8.260415005\tools\net472\System.Reflection.Metadata.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Collections.Immutable">
+      <HintPath>..\..\..\Users\WanYa\.nuget\packages\microsoft.windowsappsdk.winui\1.8.260415005\tools\net472\System.Collections.Immutable.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Buffers">
+      <HintPath>..\..\..\Users\WanYa\.nuget\packages\microsoft.windowsappsdk.winui\1.8.260415005\tools\net472\System.Buffers.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Text.Json">
+      <HintPath>..\..\..\Users\WanYa\.nuget\packages\microsoft.windowsappsdk.winui\1.8.260415005\tools\net472\System.Text.Json.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+</Project>

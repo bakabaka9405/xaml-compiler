@@ -1,0 +1,19 @@
+# .NET Build artifacts
+bin/
+obj/
+*.user
+*.suo
+*.cache
+*.pdb
+*.tmp
+
+# Visual Studio
+.vs/
+*.sln.docstates
+
+# NuGet
+packages/
+
+# OS generated files
+.DS_Store
+Thumbs.db

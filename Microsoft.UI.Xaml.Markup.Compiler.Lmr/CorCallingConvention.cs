@@ -1,0 +1,17 @@
+namespace Microsoft.UI.Xaml.Markup.Compiler.Lmr;
+
+internal enum CorCallingConvention
+{
+	Default = 0,
+	VarArg = 5,
+	Field = 6,
+	LocalSig = 7,
+	Property = 8,
+	Unmanaged = 9,
+	GenericInst = 10,
+	NativeVarArg = 11,
+	Mask = 15,
+	HasThis = 32,
+	ExplicitThis = 64,
+	Generic = 16
+}

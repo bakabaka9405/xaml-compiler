@@ -1,0 +1,15 @@
+namespace MS.Internal.Xaml.Parser;
+
+internal enum ScannerNodeType
+{
+	NONE,
+	ELEMENT,
+	EMPTYELEMENT,
+	ATTRIBUTE,
+	DIRECTIVE,
+	PREFIXDEFINITION,
+	PROPERTYELEMENT,
+	EMPTYPROPERTYELEMENT,
+	TEXT,
+	ENDTAG
+}
