@@ -17,6 +17,7 @@
   <ItemGroup>
     <Reference Include="System.Xml" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Xaml" />
     <Reference Include="Microsoft.UI.Xaml.Markup.Compiler.MSBuildInterop">
       <HintPath>..\..\..\Users\WanYa\.nuget\packages\microsoft.windowsappsdk.winui\1.8.260415005\tools\net472\Microsoft.UI.Xaml.Markup.Compiler.MSBuildInterop.dll</HintPath>
     </Reference>
