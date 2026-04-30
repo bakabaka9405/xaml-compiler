@@ -187,6 +187,10 @@ internal class DirectUISchemaContext : XamlSchemaContext
 
 	public override XamlDirective GetXamlDirective(string xamlNamespace, string name)
 	{
+		if (name == "SuppressXamlTrimWarnings" && xamlNamespace == "http://schemas.microsoft.com/winfx/2006/xaml")
+		{
+			return SuppressXamlTrimWarningsDirective.Value;
+		}
 		XamlDirective xamlDirective = base.GetXamlDirective(xamlNamespace, name);
 		if (xamlDirective == XamlLanguage.Arguments || xamlDirective == XamlLanguage.AsyncRecords || xamlDirective == XamlLanguage.ClassAttributes || xamlDirective == XamlLanguage.ClassModifier || xamlDirective == XamlLanguage.Code || xamlDirective == XamlLanguage.Members || xamlDirective == XamlLanguage.Subclass || xamlDirective == XamlLanguage.SynchronousMode || xamlDirective == XamlLanguage.TypeArguments || xamlDirective == XamlLanguage.FactoryMethod)
 		{
@@ -226,7 +230,7 @@ internal class DirectUISchemaContext : XamlSchemaContext
 		return null;
 	}
 
-	protected internal override XamlType GetXamlType(string xamlNamespace, string name, params XamlType[] typeArguments)
+	protected override XamlType GetXamlType(string xamlNamespace, string name, params XamlType[] typeArguments)
 	{
 		string key = $"{xamlNamespace}.{name}";
 		XamlType xamlType = null;

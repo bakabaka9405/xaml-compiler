@@ -300,7 +300,7 @@ internal class TypeInfoCollector
 			return;
 		}
 		bool flag = false;
-		XamlDomMember memberNode = domBinding.GetMemberNode(XamlLanguage.SuppressXamlTrimWarnings);
+		XamlDomMember memberNode = domBinding.GetMemberNode(SuppressXamlTrimWarningsDirective.Value);
 		bool result = default(bool);
 		if (memberNode != null && ((memberNode.Item is XamlDomValue xamlDomValue) ? xamlDomValue.Value : null) is string value && bool.TryParse(value, out result) && result)
 		{
