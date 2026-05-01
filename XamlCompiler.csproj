@@ -19,12 +19,6 @@
     <Reference Include="System.Xml" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xaml" />
-    <Reference Include="Microsoft.Build.Framework">
-      <HintPath>tools\Microsoft.Build.Framework.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.UI.Xaml.Markup.Compiler.MSBuildInterop">
-      <HintPath>tools\Microsoft.UI.Xaml.Markup.Compiler.MSBuildInterop.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="System.Memory" Version="4.5.5" />
