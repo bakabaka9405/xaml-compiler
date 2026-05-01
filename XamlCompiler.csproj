@@ -4,6 +4,8 @@
     <GenerateAssemblyInfo>False</GenerateAssemblyInfo>
     <OutputType>Exe</OutputType>
     <TargetFramework>net472</TargetFramework>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
   </PropertyGroup>
   <PropertyGroup>
     <LangVersion>14.0</LangVersion>
@@ -13,28 +15,19 @@
   <PropertyGroup>
     <RootNamespace />
   </PropertyGroup>
-  <ItemGroup />
   <ItemGroup>
     <Reference Include="System.Xml" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xaml" />
     <Reference Include="Microsoft.UI.Xaml.Markup.Compiler.MSBuildInterop">
-      <HintPath>..\..\..\Users\WanYa\.nuget\packages\microsoft.windowsappsdk.winui\1.8.260415005\tools\net472\Microsoft.UI.Xaml.Markup.Compiler.MSBuildInterop.dll</HintPath>
+      <HintPath>tools\Microsoft.UI.Xaml.Markup.Compiler.MSBuildInterop.dll</HintPath>
     </Reference>
-    <Reference Include="System.Memory">
-      <HintPath>..\..\..\Users\WanYa\.nuget\packages\microsoft.windowsappsdk.winui\1.8.260415005\tools\net472\System.Memory.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Reflection.Metadata">
-      <HintPath>..\..\..\Users\WanYa\.nuget\packages\microsoft.windowsappsdk.winui\1.8.260415005\tools\net472\System.Reflection.Metadata.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Collections.Immutable">
-      <HintPath>..\..\..\Users\WanYa\.nuget\packages\microsoft.windowsappsdk.winui\1.8.260415005\tools\net472\System.Collections.Immutable.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Buffers">
-      <HintPath>..\..\..\Users\WanYa\.nuget\packages\microsoft.windowsappsdk.winui\1.8.260415005\tools\net472\System.Buffers.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Text.Json">
-      <HintPath>..\..\..\Users\WanYa\.nuget\packages\microsoft.windowsappsdk.winui\1.8.260415005\tools\net472\System.Text.Json.dll</HintPath>
-    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="System.Memory" Version="4.5.5" />
+    <PackageReference Include="System.Buffers" Version="4.5.1" />
+    <PackageReference Include="System.Collections.Immutable" Version="6.0.0" />
+    <PackageReference Include="System.Reflection.Metadata" Version="6.0.0" />
+    <PackageReference Include="System.Text.Json" Version="6.0.10" />
   </ItemGroup>
 </Project>
