@@ -1,0 +1,103 @@
+{
+  "name": "XAML",
+  "scopeName": "text.xml",
+  "fileTypes": ["xaml"],
+  "patterns": [
+    {
+      "include": "#comments"
+    },
+    {
+      "include": "#tags"
+    },
+    {
+      "include": "#markup-extensions"
+    }
+  ],
+  "repository": {
+    "comments": {
+      "patterns": [
+        {
+          "name": "comment.block.xml",
+          "begin": "<!--",
+          "end": "-->",
+          "captures": {
+            "0": { "name": "punctuation.definition.comment.xml" }
+          }
+        }
+      ]
+    },
+    "tags": {
+      "patterns": [
+        {
+          "name": "meta.tag.xml",
+          "begin": "(</?)([A-Za-z][A-Za-z0-9._]*)",
+          "end": "(/?>)",
+          "beginCaptures": {
+            "1": { "name": "punctuation.definition.tag.xml" },
+            "2": { "name": "entity.name.tag.xml" }
+          },
+          "endCaptures": {
+            "1": { "name": "punctuation.definition.tag.xml" }
+          },
+          "patterns": [
+            {
+              "include": "#tag-attributes"
+            }
+          ]
+        }
+      ]
+    },
+    "tag-attributes": {
+      "patterns": [
+        {
+          "name": "entity.other.attribute-name.xml",
+          "match": "\\b([A-Za-z][A-Za-z0-9._:]*)\\b(?=\\s*=)"
+        },
+        {
+          "name": "string.quoted.double.xml",
+          "begin": "\"",
+          "end": "\"",
+          "patterns": [
+            {
+              "include": "#markup-extensions"
+            }
+          ]
+        },
+        {
+          "name": "string.quoted.single.xml",
+          "begin": "'",
+          "end": "'"
+        }
+      ]
+    },
+    "markup-extensions": {
+      "patterns": [
+        {
+          "name": "meta.markup.extension.xml",
+          "begin": "\\{",
+          "end": "\\}",
+          "beginCaptures": {
+            "0": { "name": "punctuation.definition.markup.xml" }
+          },
+          "endCaptures": {
+            "0": { "name": "punctuation.definition.markup.xml" }
+          },
+          "patterns": [
+            {
+              "name": "support.class.xml",
+              "match": "\\b([A-Za-z][A-Za-z0-9._]*Extension)\\b"
+            },
+            {
+              "name": "support.class.xml",
+              "match": "\\b(x:Bind|x:Bind|x:Null|x:Array|x:Static|x:Type|x:Reference|x:Load)\\b"
+            },
+            {
+              "name": "keyword.other.xml",
+              "match": "\\b(True|False|Null)\\b"
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

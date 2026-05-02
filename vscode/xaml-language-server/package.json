@@ -1,0 +1,99 @@
+{
+  "name": "xaml-language-server",
+  "displayName": "WinUI XAML Language Server",
+  "description": "XAML language support for WinUI / Windows App SDK projects, powered by the Microsoft XAML Compiler",
+  "version": "0.1.0",
+  "publisher": "xaml-compiler",
+  "license": "MIT",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
+  "activationEvents": [
+    "workspaceContains:**/*.xaml"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "languages": [
+      {
+        "id": "xml",
+        "extensions": [
+          ".xaml"
+        ],
+        "aliases": [
+          "XAML",
+          "xaml"
+        ],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "xml",
+        "scopeName": "text.xml",
+        "path": "./syntaxes/xaml.tmLanguage.json"
+      }
+    ],
+    "configuration": {
+      "title": "XAML Language Server",
+      "properties": {
+        "xaml.server.trace.server": {
+          "type": "string",
+          "scope": "window",
+          "enum": [
+            "off",
+            "messages",
+            "verbose"
+          ],
+          "default": "off",
+          "description": "Traces the communication between VS Code and the XAML language server."
+        },
+        "xaml.server.maxNumberOfProblems": {
+          "type": "number",
+          "scope": "resource",
+          "default": 100,
+          "description": "Controls the maximum number of problems produced by the server."
+        },
+        "xaml.server.dotnetPath": {
+          "type": "string",
+          "scope": "machine",
+          "default": "dotnet",
+          "description": "Path to the dotnet executable used to launch the language server."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run package",
+    "compile": "npm run check-types && npm run lint && node esbuild.js",
+    "compile-tests": "tsc -p ./tsconfig.test.json",
+    "watch": "npm-run-all -p watch:*",
+    "watch:esbuild": "node esbuild.js --watch",
+    "watch:tsc": "tsc --noEmit --watch --project tsconfig.json",
+    "prepare-server": "node scripts/prepare-server.js",
+    "prepare-server:debug": "node scripts/prepare-server.js --configuration Debug",
+    "check-types": "tsc --noEmit",
+    "package": "node scripts/prepare-server.js && npm run check-types && npm run lint && node esbuild.js --production",
+    "pretest": "npm run compile && npm run compile-tests",
+    "test": "vscode-test",
+    "lint": "eslint src"
+  },
+  "devDependencies": {
+    "@types/mocha": "^10.0.10",
+    "@types/node": "^22.0.0",
+    "@types/vscode": "^1.85.0",
+    "@vscode/test-cli": "^0.0.12",
+    "@vscode/test-electron": "^2.5.2",
+    "@vscode/vsce": "^3.8.0",
+    "esbuild": "^0.27.3",
+    "eslint": "^9.39.3",
+    "npm-run-all": "^4.1.5",
+    "typescript": "^5.9.0",
+    "typescript-eslint": "^8.56.1"
+  },
+  "dependencies": {
+    "vscode-languageclient": "^9.0.1"
+  }
+}

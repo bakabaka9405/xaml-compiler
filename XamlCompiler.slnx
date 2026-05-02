@@ -1,0 +1,13 @@
+<Solution>
+  <Configurations>
+    <BuildType Name="Debug" />
+    <BuildType Name="Release" />
+    <Platform Name="Any CPU" />
+  </Configurations>
+  <Folder Name="/src/XamlCompiler/">
+    <Project Path="src/XamlCompiler/XamlCompiler.csproj" />
+  </Folder>
+  <Folder Name="/src/LanguageServer/">
+    <Project Path="src/XamlCompiler.LanguageServer/XamlCompiler.LanguageServer.csproj" />
+  </Folder>
+</Solution>

@@ -7,12 +7,23 @@ obj/
 *.pdb
 *.tmp
 
+# LSP Server publish output
+src/**/publish/
+
 # Visual Studio
 .vs/
 *.sln.docstates
 
 # NuGet
 packages/
+
+# VS Code extension artifacts
+vscode/**/node_modules/
+vscode/**/out/
+vscode/**/dist/
+vscode/**/*.vsix
+vscode/**/server/
+vscode/**/.vscode-test/
 
 # OS generated files
 .DS_Store
