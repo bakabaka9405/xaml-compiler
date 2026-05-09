@@ -317,6 +317,47 @@ suite('parsePackagesConfigVersions', () => {
         assert.strictEqual(result, null);
     });
 
+    test('extracts Win2D version from packages.config', () => {
+        const scope = createTempScope();
+        try {
+            const configContent =
+                '<?xml version="1.0" encoding="utf-8"?>\n' +
+                '<packages>\n' +
+                '  <package id="Microsoft.WindowsAppSDK" version="1.8.260416003" targetFramework="native" />\n' +
+                '  <package id="Microsoft.Graphics.Win2D" version="1.2.1" targetFramework="native" />\n' +
+                '</packages>\n';
+
+            const configPath = path.join(scope.dir, 'packages.config');
+            fs.writeFileSync(configPath, configContent, 'utf-8');
+
+            const result = lsp.parsePackagesConfigVersions(configPath);
+            assert.ok(result !== null);
+            assert.strictEqual(result!.win2d, '1.2.1');
+        } finally {
+            disposeTempScope(scope);
+        }
+    });
+
+    test('uses default 1.4.0 for win2d when absent', () => {
+        const scope = createTempScope();
+        try {
+            const configContent =
+                '<?xml version="1.0" encoding="utf-8"?>\n' +
+                '<packages>\n' +
+                '  <package id="Microsoft.WindowsAppSDK" version="1.8.260416003" targetFramework="native" />\n' +
+                '</packages>\n';
+
+            const configPath = path.join(scope.dir, 'packages.config');
+            fs.writeFileSync(configPath, configContent, 'utf-8');
+
+            const result = lsp.parsePackagesConfigVersions(configPath);
+            assert.ok(result !== null);
+            assert.strictEqual(result!.win2d, '1.4.0');
+        } finally {
+            disposeTempScope(scope);
+        }
+    });
+
     test('uses umbrella version for sub-packages when absent', () => {
         const scope = createTempScope();
         try {
@@ -544,6 +585,23 @@ suite('discoverBestNuGetVersions', () => {
             disposeTempScope(scope);
         }
     });
+
+    test('auto-discovers Win2D version from NuGet cache', () => {
+        const scope = createTempScope();
+        try {
+            const packagesDir = path.join(scope.dir, 'packages');
+            fs.mkdirSync(packagesDir, { recursive: true });
+
+            // Create Win2D versions in flat layout
+            fs.mkdirSync(path.join(packagesDir, 'microsoft.graphics.win2d.1.1.0'));
+            fs.mkdirSync(path.join(packagesDir, 'microsoft.graphics.win2d.1.2.1'));
+
+            const result = lsp.discoverBestNuGetVersions(packagesDir);
+            assert.strictEqual(result.win2d, '1.2.1');
+        } finally {
+            disposeTempScope(scope);
+        }
+    });
 });
 
 // ---------------------------------------------------------------------------
@@ -571,6 +629,7 @@ suite('collectSubPackageAppSdkWinmds', () => {
                 foundation: '1.8.260415000',
                 winui: '1.8.260415005',
                 interactive: '1.8.260415001',
+                win2d: '1.4.0',
             };
 
             const result = lsp.collectSubPackageAppSdkWinmds(nugetRoot, versions);
@@ -606,6 +665,7 @@ suite('collectSubPackageAppSdkWinmds', () => {
                 foundation: '1.8.260415000',
                 winui: '1.8.260415005',
                 interactive: '1.8.260415001',
+                win2d: '1.4.0',
             };
 
             const result = lsp.collectSubPackageAppSdkWinmds(nugetRoot, versions);
@@ -635,6 +695,7 @@ suite('collectSubPackageAppSdkWinmds', () => {
                 foundation: '1.6.0',
                 winui: '1.6.0',
                 interactive: '1.6.0',
+                win2d: '1.4.0',
             };
 
             const result = lsp.collectSubPackageAppSdkWinmds(nugetRoot, versions);
@@ -740,6 +801,60 @@ suite('discoverWebView2Winmd', () => {
     test('returns null when WebView2 package is missing', () => {
         const result = lsp.discoverWebView2Winmd('C:\\Nonexistent\\NuGet', '0.0.0');
         assert.strictEqual(result, null);
+    });
+});
+
+// ---------------------------------------------------------------------------
+// Suite: collectWin2DWinmds
+// ---------------------------------------------------------------------------
+
+suite('collectWin2DWinmds', () => {
+    test('finds WinMD at microsoft.graphics.win2d/{v}/lib/uap10.0', () => {
+        const scope = createTempScope();
+        try {
+            const nugetRoot = path.join(scope.dir, '.nuget', 'packages');
+            const winmdDir = path.join(
+                nugetRoot,
+                'microsoft.graphics.win2d',
+                '1.2.1',
+                'lib',
+                'uap10.0',
+            );
+            fs.mkdirSync(winmdDir, { recursive: true });
+            const winmdFile = createWinmdFile(winmdDir, 'Microsoft.Graphics.Canvas.winmd');
+
+            const result = lsp.collectWin2DWinmds(nugetRoot, '1.2.1');
+            assert.strictEqual(result.length, 1);
+            assert.strictEqual(result[0], winmdFile);
+        } finally {
+            disposeTempScope(scope);
+        }
+    });
+
+    test('returns empty array when package is missing', () => {
+        const result = lsp.collectWin2DWinmds('C:\\Nonexistent\\NuGet', '9.9.9');
+        assert.deepStrictEqual(result, []);
+    });
+
+    test('returns empty array when directory exists but file is absent', () => {
+        const scope = createTempScope();
+        try {
+            const nugetRoot = path.join(scope.dir, '.nuget', 'packages');
+            const winmdDir = path.join(
+                nugetRoot,
+                'microsoft.graphics.win2d',
+                '1.2.1',
+                'lib',
+                'uap10.0',
+            );
+            fs.mkdirSync(winmdDir, { recursive: true });
+            // Intentionally not creating the .winmd file
+
+            const result = lsp.collectWin2DWinmds(nugetRoot, '1.2.1');
+            assert.deepStrictEqual(result, []);
+        } finally {
+            disposeTempScope(scope);
+        }
     });
 });
 
@@ -923,6 +1038,87 @@ suite('discoverLspContext', () => {
                 assert.ok(
                     result!.sourceDir.includes('src') || result!.sourceDir.includes('hello'),
                     `Expected sourceDir to contain 'src' or 'hello', got: ${result!.sourceDir}`,
+                );
+            } finally {
+                process.env.WindowsSdkDir = originalSdkDir;
+                process.env.USERPROFILE = userProfileEnv;
+            }
+        } finally {
+            disposeTempScope(scope);
+        }
+    });
+
+    test('includes Win2D WinMD in referenceAssemblies when cache contains it', async () => {
+        const scope = createTempScope();
+        try {
+            const workspaceRoot = scope.dir;
+            fs.mkdirSync(path.join(workspaceRoot, 'src'), { recursive: true });
+
+            // Create xmake.lua with WinAppSDK version
+            const luaContent =
+                'add_requires("Microsoft.WindowsAppSDK 1.8.0")\n' +
+                'add_requires("Microsoft.Web.WebView2 1.0.3912.50")\n';
+            fs.writeFileSync(path.join(workspaceRoot, 'xmake.lua'), luaContent, 'utf-8');
+
+            // Set up mock Windows SDK
+            const mockSdkVersion = '10.0.22621.0';
+            const mockSdkRoot = createMockSdk(scope.dir, mockSdkVersion);
+            createWinmdFile(
+                path.join(mockSdkRoot, 'References', mockSdkVersion),
+                'Windows.Foundation.winmd',
+            );
+
+            const originalSdkDir = process.env.WindowsSdkDir;
+            process.env.WindowsSdkDir = mockSdkRoot;
+
+            // Set up mock NuGet cache with Win2D
+            const nugetRoot = path.join(scope.dir, 'NuGetCache', '.nuget', 'packages');
+            const userProfileEnv = process.env.USERPROFILE;
+            process.env.USERPROFILE = path.join(scope.dir, 'NuGetCache');
+
+            // WinAppSDK monolithic
+            const appSdkDir = path.join(
+                nugetRoot,
+                'microsoft.windowsappsdk',
+                '1.8.0',
+                'lib',
+                'net6.0-windows10.0.19041.0',
+            );
+            fs.mkdirSync(appSdkDir, { recursive: true });
+            createWinmdFile(appSdkDir, 'Microsoft.WindowsAppSDK.winmd');
+
+            // WebView2
+            const wv2Dir = path.join(
+                nugetRoot,
+                'microsoft.web.webview2',
+                '1.0.3912.50',
+                'lib',
+            );
+            fs.mkdirSync(wv2Dir, { recursive: true });
+            createWinmdFile(wv2Dir, 'Microsoft.Web.WebView2.Core.winmd');
+
+            // Win2D
+            const win2dDir = path.join(
+                nugetRoot,
+                'microsoft.graphics.win2d',
+                '1.4.0',
+                'lib',
+                'uap10.0',
+            );
+            fs.mkdirSync(win2dDir, { recursive: true });
+            const win2dWinmd = createWinmdFile(win2dDir, 'Microsoft.Graphics.Canvas.winmd');
+
+            try {
+                const result = await lsp.discoverLspContext(workspaceRoot);
+
+                assert.ok(result !== null, 'Context should not be null');
+                // Platform winmd + AppSDK + Win2D + WebView2 = 4
+                assert.strictEqual(result!.referenceAssemblies.length, 4,
+                    `Expected 4 assemblies, got ${result!.referenceAssemblies.length}`);
+                // Verify Win2D is included
+                assert.ok(
+                    result!.referenceAssemblies.includes(win2dWinmd),
+                    `Expected referenceAssemblies to include Win2D WinMD at ${win2dWinmd}`,
                 );
             } finally {
                 process.env.WindowsSdkDir = originalSdkDir;

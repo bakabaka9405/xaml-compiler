@@ -27,6 +27,8 @@ export interface NuGetVersions extends XmakeVersions {
     winui: string;
     /** Microsoft.WindowsAppSDK.InteractiveExperiences 子包版本 */
     interactive: string;
+    /** Microsoft.Graphics.Win2D 包版本 */
+    win2d: string;
 }
 
 // ---------------------------------------------------------------------------
@@ -178,6 +180,9 @@ export function parsePackagesConfigVersions(
         const webview2Match = content.match(
             /id="Microsoft\.Web\.WebView2"\s+version="([\d.]+)"/,
         );
+        const win2dMatch = content.match(
+            /id="Microsoft\.Graphics\.Win2D"\s+version="([\d.]+)"/,
+        );
 
         if (!umbrellaMatch) {
             return null;
@@ -189,6 +194,7 @@ export function parsePackagesConfigVersions(
             foundation: foundationMatch ? foundationMatch[1] : umbrellaMatch[1],
             winui: winuiMatch ? winuiMatch[1] : umbrellaMatch[1],
             interactive: interactiveMatch ? interactiveMatch[1] : umbrellaMatch[1],
+            win2d: win2dMatch ? win2dMatch[1] : '1.4.0',
         };
     } catch {
         return null;
@@ -397,6 +403,29 @@ export function discoverWebView2Winmd(nugetRoot: string, version: string): strin
     } catch {
         return null;
     }
+}
+
+/**
+ * Collect Win2D WinMD from the NuGet package cache.
+ *
+ * Win2D v1.2.0+ provides a single WinMD under
+ * {@code lib/uap10.0/Microsoft.Graphics.Canvas.winmd}.
+ */
+export function collectWin2DWinmds(nugetRoot: string, version: string): string[] {
+    const winmdPath = path.join(
+        nugetRoot,
+        'microsoft.graphics.win2d',
+        version,
+        'lib',
+        'uap10.0',
+        'Microsoft.Graphics.Canvas.winmd',
+    );
+
+    if (!fs.existsSync(winmdPath)) {
+        return [];
+    }
+
+    return [winmdPath];
 }
 
 // ---------------------------------------------------------------------------
@@ -608,6 +637,7 @@ export function discoverBestNuGetVersions(nugetRoot: string): NuGetVersions {
         foundation: '1.8.0',
         winui: '1.8.0',
         interactive: '1.8.0',
+        win2d: '1.4.0',
     };
 
     if (!fs.existsSync(nugetRoot)) {
@@ -667,6 +697,7 @@ export function discoverBestNuGetVersions(nugetRoot: string): NuGetVersions {
         const bestWinui = scanVersion('microsoft.windowsappsdk.winui.');
         const bestIxp = scanVersion('microsoft.windowsappsdk.interactiveexperiences.');
         const bestWebView2 = scanVersion('microsoft.web.webview2.');
+        const bestWin2d = scanVersion('microsoft.graphics.win2d.');
 
         // Version format validation: NuGet uses SemVer (can have 3 or 4 segments)
         const isValidSemVerV3 = (v: string): boolean => /^\d+\.\d+\.\d+/.test(v);
@@ -682,6 +713,8 @@ export function discoverBestNuGetVersions(nugetRoot: string): NuGetVersions {
                 bestWinui && isValidSemVerV3(bestWinui) ? bestWinui : updatedDefaults.winui,
             interactive:
                 bestIxp && isValidSemVerV3(bestIxp) ? bestIxp : updatedDefaults.interactive,
+            win2d:
+                bestWin2d && isValidSemVerV3(bestWin2d) ? bestWin2d : updatedDefaults.win2d,
         };
     } catch {
         return updatedDefaults;
@@ -725,6 +758,7 @@ export async function discoverLspContext(
                 foundation: pkgVersions?.foundation ?? xmakeVersions.winAppSdk,
                 winui: pkgVersions?.winui ?? xmakeVersions.winAppSdk,
                 interactive: pkgVersions?.interactive ?? xmakeVersions.winAppSdk,
+                win2d: pkgVersions?.win2d ?? '1.4.0',
             };
         } else {
             // Strategy B: auto-discover from NuGet cache
@@ -734,6 +768,7 @@ export async function discoverLspContext(
         // Phase 3: NuGet cache WinMD collection (sub-package aware)
         const appSdkWinmds = collectSubPackageAppSdkWinmds(nugetRoot, versions);
         const webView2Winmd = discoverWebView2Winmd(nugetRoot, versions.webView2);
+        const win2dWinmds = collectWin2DWinmds(nugetRoot, versions.win2d);
 
         // Phase 4: source directory resolution (recursive search)
         const sourceDir = resolveSourceDir(workspaceRoot);
@@ -745,6 +780,7 @@ export async function discoverLspContext(
         const referenceAssemblies: string[] = [
             ...platformWinmds,
             ...appSdkWinmds,
+            ...win2dWinmds,
         ];
         if (webView2Winmd !== null) {
             referenceAssemblies.push(webView2Winmd);
