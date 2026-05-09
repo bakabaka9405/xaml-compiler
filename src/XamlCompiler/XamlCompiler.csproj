@@ -11,6 +11,7 @@
     <LangVersion>14.0</LangVersion>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
     <CheckForOverflowUnderflow>False</CheckForOverflowUnderflow>
+    <NoWarn>CS3021;CS0105</NoWarn>
   </PropertyGroup>
   <PropertyGroup>
     <RootNamespace />
@@ -26,5 +27,7 @@
     <PackageReference Include="System.Collections.Immutable" Version="6.0.0" />
     <PackageReference Include="System.Reflection.Metadata" Version="6.0.0" />
     <PackageReference Include="System.Text.Json" Version="8.0.5" />
+    <PackageReference Include="Antlr4.Runtime.Standard" Version="4.13.1" />
   </ItemGroup>
+
 </Project>

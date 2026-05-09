@@ -67,17 +67,13 @@ internal class ConditionalNamespaceListener : ConditionalNamespaceBaseListener
 
 	public override void ExitApi_information([NotNull] ConditionalNamespaceParser.Api_informationContext context)
 	{
-		string text = context.IDENTIFIER().GetText();
-		ConditionalNamespaceParser.Function_paramContext[] array = context.function_param();
+		string text = context.IDENTIFIER(0).GetText();
+		ConditionalNamespaceParser.Function_paramContext paramCtx = context.function_param();
 		List<ApiInformationParameter> list = null;
-		if (array.Any())
+		if (paramCtx != null)
 		{
 			list = new List<ApiInformationParameter>();
-			ConditionalNamespaceParser.Function_paramContext[] array2 = array;
-			foreach (ConditionalNamespaceParser.Function_paramContext function_paramContext in array2)
-			{
-				list.Add(function_paramContext.ApiInformationParameter);
-			}
+			list.Add(new ApiInformationParameter(paramCtx.Value));
 		}
 		try
 		{
@@ -100,6 +96,6 @@ internal class ConditionalNamespaceListener : ConditionalNamespaceBaseListener
 	public override void ExitFunction_param([NotNull] ConditionalNamespaceParser.Function_paramContext context)
 	{
 		string text = context.GetText();
-		context.ApiInformationParameter = new ApiInformationParameter(text);
+		context.Value = text;
 	}
 }

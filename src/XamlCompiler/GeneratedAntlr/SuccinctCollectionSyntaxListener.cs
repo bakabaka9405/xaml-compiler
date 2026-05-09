@@ -19,117 +19,85 @@
 // Ambiguous reference in cref attribute
 #pragma warning disable 419
 
-
 using Antlr4.Runtime.Misc;
-using IErrorNode = Antlr4.Runtime.Tree.IErrorNode;
-using ITerminalNode = Antlr4.Runtime.Tree.ITerminalNode;
+using IParseTreeListener = Antlr4.Runtime.Tree.IParseTreeListener;
 using IToken = Antlr4.Runtime.IToken;
-using ParserRuleContext = Antlr4.Runtime.ParserRuleContext;
 
 /// <summary>
-/// This class provides an empty implementation of <see cref="ISuccinctCollectionSyntaxListener"/>,
-/// which can be extended to create a listener which only needs to handle a subset
-/// of the available methods.
+/// This interface defines a complete listener for a parse tree produced by
+/// <see cref="SuccinctCollectionSyntaxParser"/>.
 /// </summary>
 [System.CodeDom.Compiler.GeneratedCode("ANTLR", "4.13.1")]
-[System.Diagnostics.DebuggerNonUserCode]
 [System.CLSCompliant(false)]
-public partial class SuccinctCollectionSyntaxBaseListener : ISuccinctCollectionSyntaxListener {
+public interface ISuccinctCollectionSyntaxListener : IParseTreeListener {
 	/// <summary>
 	/// Enter a parse tree produced by <see cref="SuccinctCollectionSyntaxParser.program"/>.
-	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void EnterProgram([NotNull] SuccinctCollectionSyntaxParser.ProgramContext context) { }
+	void EnterProgram([NotNull] SuccinctCollectionSyntaxParser.ProgramContext context);
 	/// <summary>
 	/// Exit a parse tree produced by <see cref="SuccinctCollectionSyntaxParser.program"/>.
-	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void ExitProgram([NotNull] SuccinctCollectionSyntaxParser.ProgramContext context) { }
+	void ExitProgram([NotNull] SuccinctCollectionSyntaxParser.ProgramContext context);
 	/// <summary>
 	/// Enter a parse tree produced by <see cref="SuccinctCollectionSyntaxParser.items"/>.
-	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void EnterItems([NotNull] SuccinctCollectionSyntaxParser.ItemsContext context) { }
+	void EnterItems([NotNull] SuccinctCollectionSyntaxParser.ItemsContext context);
 	/// <summary>
 	/// Exit a parse tree produced by <see cref="SuccinctCollectionSyntaxParser.items"/>.
-	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void ExitItems([NotNull] SuccinctCollectionSyntaxParser.ItemsContext context) { }
+	void ExitItems([NotNull] SuccinctCollectionSyntaxParser.ItemsContext context);
 	/// <summary>
 	/// Enter a parse tree produced by <see cref="SuccinctCollectionSyntaxParser.z"/>.
-	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void EnterZ([NotNull] SuccinctCollectionSyntaxParser.ZContext context) { }
+	void EnterZ([NotNull] SuccinctCollectionSyntaxParser.ZContext context);
 	/// <summary>
 	/// Exit a parse tree produced by <see cref="SuccinctCollectionSyntaxParser.z"/>.
-	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void ExitZ([NotNull] SuccinctCollectionSyntaxParser.ZContext context) { }
+	void ExitZ([NotNull] SuccinctCollectionSyntaxParser.ZContext context);
 	/// <summary>
 	/// Enter a parse tree produced by <see cref="SuccinctCollectionSyntaxParser.item"/>.
-	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void EnterItem([NotNull] SuccinctCollectionSyntaxParser.ItemContext context) { }
+	void EnterItem([NotNull] SuccinctCollectionSyntaxParser.ItemContext context);
 	/// <summary>
 	/// Exit a parse tree produced by <see cref="SuccinctCollectionSyntaxParser.item"/>.
-	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void ExitItem([NotNull] SuccinctCollectionSyntaxParser.ItemContext context) { }
+	void ExitItem([NotNull] SuccinctCollectionSyntaxParser.ItemContext context);
 	/// <summary>
 	/// Enter a parse tree produced by <see cref="SuccinctCollectionSyntaxParser.text"/>.
-	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void EnterText([NotNull] SuccinctCollectionSyntaxParser.TextContext context) { }
+	void EnterText([NotNull] SuccinctCollectionSyntaxParser.TextContext context);
 	/// <summary>
 	/// Exit a parse tree produced by <see cref="SuccinctCollectionSyntaxParser.text"/>.
-	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void ExitText([NotNull] SuccinctCollectionSyntaxParser.TextContext context) { }
+	void ExitText([NotNull] SuccinctCollectionSyntaxParser.TextContext context);
 	/// <summary>
 	/// Enter a parse tree produced by <see cref="SuccinctCollectionSyntaxParser.literal_text"/>.
-	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void EnterLiteral_text([NotNull] SuccinctCollectionSyntaxParser.Literal_textContext context) { }
+	void EnterLiteral_text([NotNull] SuccinctCollectionSyntaxParser.Literal_textContext context);
 	/// <summary>
 	/// Exit a parse tree produced by <see cref="SuccinctCollectionSyntaxParser.literal_text"/>.
-	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void ExitLiteral_text([NotNull] SuccinctCollectionSyntaxParser.Literal_textContext context) { }
+	void ExitLiteral_text([NotNull] SuccinctCollectionSyntaxParser.Literal_textContext context);
 	/// <summary>
 	/// Enter a parse tree produced by <see cref="SuccinctCollectionSyntaxParser.sequence"/>.
-	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void EnterSequence([NotNull] SuccinctCollectionSyntaxParser.SequenceContext context) { }
+	void EnterSequence([NotNull] SuccinctCollectionSyntaxParser.SequenceContext context);
 	/// <summary>
 	/// Exit a parse tree produced by <see cref="SuccinctCollectionSyntaxParser.sequence"/>.
-	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void ExitSequence([NotNull] SuccinctCollectionSyntaxParser.SequenceContext context) { }
-
-	/// <inheritdoc/>
-	/// <remarks>The default implementation does nothing.</remarks>
-	public virtual void EnterEveryRule([NotNull] ParserRuleContext context) { }
-	/// <inheritdoc/>
-	/// <remarks>The default implementation does nothing.</remarks>
-	public virtual void ExitEveryRule([NotNull] ParserRuleContext context) { }
-	/// <inheritdoc/>
-	/// <remarks>The default implementation does nothing.</remarks>
-	public virtual void VisitTerminal([NotNull] ITerminalNode node) { }
-	/// <inheritdoc/>
-	/// <remarks>The default implementation does nothing.</remarks>
-	public virtual void VisitErrorNode([NotNull] IErrorNode node) { }
+	void ExitSequence([NotNull] SuccinctCollectionSyntaxParser.SequenceContext context);
 }

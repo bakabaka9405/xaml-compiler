@@ -19,157 +19,119 @@
 // Ambiguous reference in cref attribute
 #pragma warning disable 419
 
-
 using Antlr4.Runtime.Misc;
-using IErrorNode = Antlr4.Runtime.Tree.IErrorNode;
-using ITerminalNode = Antlr4.Runtime.Tree.ITerminalNode;
+using IParseTreeListener = Antlr4.Runtime.Tree.IParseTreeListener;
 using IToken = Antlr4.Runtime.IToken;
-using ParserRuleContext = Antlr4.Runtime.ParserRuleContext;
 
 /// <summary>
-/// This class provides an empty implementation of <see cref="IConditionalNamespaceListener"/>,
-/// which can be extended to create a listener which only needs to handle a subset
-/// of the available methods.
+/// This interface defines a complete listener for a parse tree produced by
+/// <see cref="ConditionalNamespaceParser"/>.
 /// </summary>
 [System.CodeDom.Compiler.GeneratedCode("ANTLR", "4.13.1")]
-[System.Diagnostics.DebuggerNonUserCode]
 [System.CLSCompliant(false)]
-public partial class ConditionalNamespaceBaseListener : IConditionalNamespaceListener {
+public interface IConditionalNamespaceListener : IParseTreeListener {
 	/// <summary>
 	/// Enter a parse tree produced by <see cref="ConditionalNamespaceParser.program"/>.
-	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void EnterProgram([NotNull] ConditionalNamespaceParser.ProgramContext context) { }
+	void EnterProgram([NotNull] ConditionalNamespaceParser.ProgramContext context);
 	/// <summary>
 	/// Exit a parse tree produced by <see cref="ConditionalNamespaceParser.program"/>.
-	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void ExitProgram([NotNull] ConditionalNamespaceParser.ProgramContext context) { }
+	void ExitProgram([NotNull] ConditionalNamespaceParser.ProgramContext context);
 	/// <summary>
 	/// Enter a parse tree produced by <see cref="ConditionalNamespaceParser.expression"/>.
-	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void EnterExpression([NotNull] ConditionalNamespaceParser.ExpressionContext context) { }
+	void EnterExpression([NotNull] ConditionalNamespaceParser.ExpressionContext context);
 	/// <summary>
 	/// Exit a parse tree produced by <see cref="ConditionalNamespaceParser.expression"/>.
-	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void ExitExpression([NotNull] ConditionalNamespaceParser.ExpressionContext context) { }
+	void ExitExpression([NotNull] ConditionalNamespaceParser.ExpressionContext context);
 	/// <summary>
 	/// Enter a parse tree produced by <see cref="ConditionalNamespaceParser.uri"/>.
-	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void EnterUri([NotNull] ConditionalNamespaceParser.UriContext context) { }
+	void EnterUri([NotNull] ConditionalNamespaceParser.UriContext context);
 	/// <summary>
 	/// Exit a parse tree produced by <see cref="ConditionalNamespaceParser.uri"/>.
-	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void ExitUri([NotNull] ConditionalNamespaceParser.UriContext context) { }
+	void ExitUri([NotNull] ConditionalNamespaceParser.UriContext context);
 	/// <summary>
 	/// Enter a parse tree produced by <see cref="ConditionalNamespaceParser.api_information"/>.
-	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void EnterApi_information([NotNull] ConditionalNamespaceParser.Api_informationContext context) { }
+	void EnterApi_information([NotNull] ConditionalNamespaceParser.Api_informationContext context);
 	/// <summary>
 	/// Exit a parse tree produced by <see cref="ConditionalNamespaceParser.api_information"/>.
-	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void ExitApi_information([NotNull] ConditionalNamespaceParser.Api_informationContext context) { }
+	void ExitApi_information([NotNull] ConditionalNamespaceParser.Api_informationContext context);
 	/// <summary>
 	/// Enter a parse tree produced by <see cref="ConditionalNamespaceParser.function_param"/>.
-	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void EnterFunction_param([NotNull] ConditionalNamespaceParser.Function_paramContext context) { }
+	void EnterFunction_param([NotNull] ConditionalNamespaceParser.Function_paramContext context);
 	/// <summary>
 	/// Exit a parse tree produced by <see cref="ConditionalNamespaceParser.function_param"/>.
-	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void ExitFunction_param([NotNull] ConditionalNamespaceParser.Function_paramContext context) { }
+	void ExitFunction_param([NotNull] ConditionalNamespaceParser.Function_paramContext context);
 	/// <summary>
 	/// Enter a parse tree produced by <see cref="ConditionalNamespaceParser.target_platform_value"/>.
-	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void EnterTarget_platform_value([NotNull] ConditionalNamespaceParser.Target_platform_valueContext context) { }
+	void EnterTarget_platform_value([NotNull] ConditionalNamespaceParser.Target_platform_valueContext context);
 	/// <summary>
 	/// Exit a parse tree produced by <see cref="ConditionalNamespaceParser.target_platform_value"/>.
-	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void ExitTarget_platform_value([NotNull] ConditionalNamespaceParser.Target_platform_valueContext context) { }
+	void ExitTarget_platform_value([NotNull] ConditionalNamespaceParser.Target_platform_valueContext context);
 	/// <summary>
 	/// Enter a parse tree produced by <see cref="ConditionalNamespaceParser.query_string"/>.
-	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void EnterQuery_string([NotNull] ConditionalNamespaceParser.Query_stringContext context) { }
+	void EnterQuery_string([NotNull] ConditionalNamespaceParser.Query_stringContext context);
 	/// <summary>
 	/// Exit a parse tree produced by <see cref="ConditionalNamespaceParser.query_string"/>.
-	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void ExitQuery_string([NotNull] ConditionalNamespaceParser.Query_stringContext context) { }
+	void ExitQuery_string([NotNull] ConditionalNamespaceParser.Query_stringContext context);
 	/// <summary>
 	/// Enter a parse tree produced by the <c>QueryStringTargetPlatform</c>
 	/// labeled alternative in <see cref="ConditionalNamespaceParser.query_string_component"/>.
-	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void EnterQueryStringTargetPlatform([NotNull] ConditionalNamespaceParser.QueryStringTargetPlatformContext context) { }
+	void EnterQueryStringTargetPlatform([NotNull] ConditionalNamespaceParser.QueryStringTargetPlatformContext context);
 	/// <summary>
 	/// Exit a parse tree produced by the <c>QueryStringTargetPlatform</c>
 	/// labeled alternative in <see cref="ConditionalNamespaceParser.query_string_component"/>.
-	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void ExitQueryStringTargetPlatform([NotNull] ConditionalNamespaceParser.QueryStringTargetPlatformContext context) { }
+	void ExitQueryStringTargetPlatform([NotNull] ConditionalNamespaceParser.QueryStringTargetPlatformContext context);
 	/// <summary>
 	/// Enter a parse tree produced by the <c>QueryStringApiInformation</c>
 	/// labeled alternative in <see cref="ConditionalNamespaceParser.query_string_component"/>.
-	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void EnterQueryStringApiInformation([NotNull] ConditionalNamespaceParser.QueryStringApiInformationContext context) { }
+	void EnterQueryStringApiInformation([NotNull] ConditionalNamespaceParser.QueryStringApiInformationContext context);
 	/// <summary>
 	/// Exit a parse tree produced by the <c>QueryStringApiInformation</c>
 	/// labeled alternative in <see cref="ConditionalNamespaceParser.query_string_component"/>.
-	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void ExitQueryStringApiInformation([NotNull] ConditionalNamespaceParser.QueryStringApiInformationContext context) { }
+	void ExitQueryStringApiInformation([NotNull] ConditionalNamespaceParser.QueryStringApiInformationContext context);
 	/// <summary>
 	/// Enter a parse tree produced by <see cref="ConditionalNamespaceParser.target_platform_func"/>.
-	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void EnterTarget_platform_func([NotNull] ConditionalNamespaceParser.Target_platform_funcContext context) { }
+	void EnterTarget_platform_func([NotNull] ConditionalNamespaceParser.Target_platform_funcContext context);
 	/// <summary>
 	/// Exit a parse tree produced by <see cref="ConditionalNamespaceParser.target_platform_func"/>.
-	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void ExitTarget_platform_func([NotNull] ConditionalNamespaceParser.Target_platform_funcContext context) { }
-
-	/// <inheritdoc/>
-	/// <remarks>The default implementation does nothing.</remarks>
-	public virtual void EnterEveryRule([NotNull] ParserRuleContext context) { }
-	/// <inheritdoc/>
-	/// <remarks>The default implementation does nothing.</remarks>
-	public virtual void ExitEveryRule([NotNull] ParserRuleContext context) { }
-	/// <inheritdoc/>
-	/// <remarks>The default implementation does nothing.</remarks>
-	public virtual void VisitTerminal([NotNull] ITerminalNode node) { }
-	/// <inheritdoc/>
-	/// <remarks>The default implementation does nothing.</remarks>
-	public virtual void VisitErrorNode([NotNull] IErrorNode node) { }
+	void ExitTarget_platform_func([NotNull] ConditionalNamespaceParser.Target_platform_funcContext context);
 }

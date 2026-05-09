@@ -19,395 +19,323 @@
 // Ambiguous reference in cref attribute
 #pragma warning disable 419
 
-
 using Antlr4.Runtime.Misc;
-using IErrorNode = Antlr4.Runtime.Tree.IErrorNode;
-using ITerminalNode = Antlr4.Runtime.Tree.ITerminalNode;
+using IParseTreeListener = Antlr4.Runtime.Tree.IParseTreeListener;
 using IToken = Antlr4.Runtime.IToken;
-using ParserRuleContext = Antlr4.Runtime.ParserRuleContext;
 
 /// <summary>
-/// This class provides an empty implementation of <see cref="IBindingPathListener"/>,
-/// which can be extended to create a listener which only needs to handle a subset
-/// of the available methods.
+/// This interface defines a complete listener for a parse tree produced by
+/// <see cref="BindingPathParser"/>.
 /// </summary>
 [System.CodeDom.Compiler.GeneratedCode("ANTLR", "4.13.1")]
-[System.Diagnostics.DebuggerNonUserCode]
 [System.CLSCompliant(false)]
-public partial class BindingPathBaseListener : IBindingPathListener {
+public interface IBindingPathListener : IParseTreeListener {
 	/// <summary>
 	/// Enter a parse tree produced by <see cref="BindingPathParser.program"/>.
-	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void EnterProgram([NotNull] BindingPathParser.ProgramContext context) { }
+	void EnterProgram([NotNull] BindingPathParser.ProgramContext context);
 	/// <summary>
 	/// Exit a parse tree produced by <see cref="BindingPathParser.program"/>.
-	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void ExitProgram([NotNull] BindingPathParser.ProgramContext context) { }
+	void ExitProgram([NotNull] BindingPathParser.ProgramContext context);
 	/// <summary>
 	/// Enter a parse tree produced by <see cref="BindingPathParser.decimal_value"/>.
-	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void EnterDecimal_value([NotNull] BindingPathParser.Decimal_valueContext context) { }
+	void EnterDecimal_value([NotNull] BindingPathParser.Decimal_valueContext context);
 	/// <summary>
 	/// Exit a parse tree produced by <see cref="BindingPathParser.decimal_value"/>.
-	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void ExitDecimal_value([NotNull] BindingPathParser.Decimal_valueContext context) { }
+	void ExitDecimal_value([NotNull] BindingPathParser.Decimal_valueContext context);
 	/// <summary>
 	/// Enter a parse tree produced by <see cref="BindingPathParser.boolean_value"/>.
-	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void EnterBoolean_value([NotNull] BindingPathParser.Boolean_valueContext context) { }
+	void EnterBoolean_value([NotNull] BindingPathParser.Boolean_valueContext context);
 	/// <summary>
 	/// Exit a parse tree produced by <see cref="BindingPathParser.boolean_value"/>.
-	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void ExitBoolean_value([NotNull] BindingPathParser.Boolean_valueContext context) { }
+	void ExitBoolean_value([NotNull] BindingPathParser.Boolean_valueContext context);
 	/// <summary>
 	/// Enter a parse tree produced by <see cref="BindingPathParser.namespace_qualifier"/>.
-	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void EnterNamespace_qualifier([NotNull] BindingPathParser.Namespace_qualifierContext context) { }
+	void EnterNamespace_qualifier([NotNull] BindingPathParser.Namespace_qualifierContext context);
 	/// <summary>
 	/// Exit a parse tree produced by <see cref="BindingPathParser.namespace_qualifier"/>.
-	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void ExitNamespace_qualifier([NotNull] BindingPathParser.Namespace_qualifierContext context) { }
+	void ExitNamespace_qualifier([NotNull] BindingPathParser.Namespace_qualifierContext context);
 	/// <summary>
 	/// Enter a parse tree produced by <see cref="BindingPathParser.static_type"/>.
-	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void EnterStatic_type([NotNull] BindingPathParser.Static_typeContext context) { }
+	void EnterStatic_type([NotNull] BindingPathParser.Static_typeContext context);
 	/// <summary>
 	/// Exit a parse tree produced by <see cref="BindingPathParser.static_type"/>.
-	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void ExitStatic_type([NotNull] BindingPathParser.Static_typeContext context) { }
+	void ExitStatic_type([NotNull] BindingPathParser.Static_typeContext context);
 	/// <summary>
 	/// Enter a parse tree produced by <see cref="BindingPathParser.attached_expr"/>.
-	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void EnterAttached_expr([NotNull] BindingPathParser.Attached_exprContext context) { }
+	void EnterAttached_expr([NotNull] BindingPathParser.Attached_exprContext context);
 	/// <summary>
 	/// Exit a parse tree produced by <see cref="BindingPathParser.attached_expr"/>.
-	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void ExitAttached_expr([NotNull] BindingPathParser.Attached_exprContext context) { }
+	void ExitAttached_expr([NotNull] BindingPathParser.Attached_exprContext context);
 	/// <summary>
 	/// Enter a parse tree produced by <see cref="BindingPathParser.cast_expr"/>.
-	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void EnterCast_expr([NotNull] BindingPathParser.Cast_exprContext context) { }
+	void EnterCast_expr([NotNull] BindingPathParser.Cast_exprContext context);
 	/// <summary>
 	/// Exit a parse tree produced by <see cref="BindingPathParser.cast_expr"/>.
-	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void ExitCast_expr([NotNull] BindingPathParser.Cast_exprContext context) { }
+	void ExitCast_expr([NotNull] BindingPathParser.Cast_exprContext context);
 	/// <summary>
 	/// Enter a parse tree produced by <see cref="BindingPathParser.function"/>.
-	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void EnterFunction([NotNull] BindingPathParser.FunctionContext context) { }
+	void EnterFunction([NotNull] BindingPathParser.FunctionContext context);
 	/// <summary>
 	/// Exit a parse tree produced by <see cref="BindingPathParser.function"/>.
-	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void ExitFunction([NotNull] BindingPathParser.FunctionContext context) { }
+	void ExitFunction([NotNull] BindingPathParser.FunctionContext context);
 	/// <summary>
 	/// Enter a parse tree produced by the <c>PathStaticFuction</c>
 	/// labeled alternative in <see cref="BindingPathParser.path"/>.
-	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void EnterPathStaticFuction([NotNull] BindingPathParser.PathStaticFuctionContext context) { }
+	void EnterPathStaticFuction([NotNull] BindingPathParser.PathStaticFuctionContext context);
 	/// <summary>
 	/// Exit a parse tree produced by the <c>PathStaticFuction</c>
 	/// labeled alternative in <see cref="BindingPathParser.path"/>.
-	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void ExitPathStaticFuction([NotNull] BindingPathParser.PathStaticFuctionContext context) { }
+	void ExitPathStaticFuction([NotNull] BindingPathParser.PathStaticFuctionContext context);
 	/// <summary>
 	/// Enter a parse tree produced by the <c>PathCast</c>
 	/// labeled alternative in <see cref="BindingPathParser.path"/>.
-	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void EnterPathCast([NotNull] BindingPathParser.PathCastContext context) { }
+	void EnterPathCast([NotNull] BindingPathParser.PathCastContext context);
 	/// <summary>
 	/// Exit a parse tree produced by the <c>PathCast</c>
 	/// labeled alternative in <see cref="BindingPathParser.path"/>.
-	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void ExitPathCast([NotNull] BindingPathParser.PathCastContext context) { }
+	void ExitPathCast([NotNull] BindingPathParser.PathCastContext context);
 	/// <summary>
 	/// Enter a parse tree produced by the <c>PathPathToFunction</c>
 	/// labeled alternative in <see cref="BindingPathParser.path"/>.
-	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void EnterPathPathToFunction([NotNull] BindingPathParser.PathPathToFunctionContext context) { }
+	void EnterPathPathToFunction([NotNull] BindingPathParser.PathPathToFunctionContext context);
 	/// <summary>
 	/// Exit a parse tree produced by the <c>PathPathToFunction</c>
 	/// labeled alternative in <see cref="BindingPathParser.path"/>.
-	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void ExitPathPathToFunction([NotNull] BindingPathParser.PathPathToFunctionContext context) { }
+	void ExitPathPathToFunction([NotNull] BindingPathParser.PathPathToFunctionContext context);
 	/// <summary>
 	/// Enter a parse tree produced by the <c>PathIndexer</c>
 	/// labeled alternative in <see cref="BindingPathParser.path"/>.
-	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void EnterPathIndexer([NotNull] BindingPathParser.PathIndexerContext context) { }
+	void EnterPathIndexer([NotNull] BindingPathParser.PathIndexerContext context);
 	/// <summary>
 	/// Exit a parse tree produced by the <c>PathIndexer</c>
 	/// labeled alternative in <see cref="BindingPathParser.path"/>.
-	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void ExitPathIndexer([NotNull] BindingPathParser.PathIndexerContext context) { }
+	void ExitPathIndexer([NotNull] BindingPathParser.PathIndexerContext context);
 	/// <summary>
 	/// Enter a parse tree produced by the <c>PathCastInvalid</c>
 	/// labeled alternative in <see cref="BindingPathParser.path"/>.
-	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void EnterPathCastInvalid([NotNull] BindingPathParser.PathCastInvalidContext context) { }
+	void EnterPathCastInvalid([NotNull] BindingPathParser.PathCastInvalidContext context);
 	/// <summary>
 	/// Exit a parse tree produced by the <c>PathCastInvalid</c>
 	/// labeled alternative in <see cref="BindingPathParser.path"/>.
-	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void ExitPathCastInvalid([NotNull] BindingPathParser.PathCastInvalidContext context) { }
+	void ExitPathCastInvalid([NotNull] BindingPathParser.PathCastInvalidContext context);
 	/// <summary>
 	/// Enter a parse tree produced by the <c>PathCastPathParen</c>
 	/// labeled alternative in <see cref="BindingPathParser.path"/>.
-	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void EnterPathCastPathParen([NotNull] BindingPathParser.PathCastPathParenContext context) { }
+	void EnterPathCastPathParen([NotNull] BindingPathParser.PathCastPathParenContext context);
 	/// <summary>
 	/// Exit a parse tree produced by the <c>PathCastPathParen</c>
 	/// labeled alternative in <see cref="BindingPathParser.path"/>.
-	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void ExitPathCastPathParen([NotNull] BindingPathParser.PathCastPathParenContext context) { }
+	void ExitPathCastPathParen([NotNull] BindingPathParser.PathCastPathParenContext context);
 	/// <summary>
 	/// Enter a parse tree produced by the <c>PathFunction</c>
 	/// labeled alternative in <see cref="BindingPathParser.path"/>.
-	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void EnterPathFunction([NotNull] BindingPathParser.PathFunctionContext context) { }
+	void EnterPathFunction([NotNull] BindingPathParser.PathFunctionContext context);
 	/// <summary>
 	/// Exit a parse tree produced by the <c>PathFunction</c>
 	/// labeled alternative in <see cref="BindingPathParser.path"/>.
-	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void ExitPathFunction([NotNull] BindingPathParser.PathFunctionContext context) { }
+	void ExitPathFunction([NotNull] BindingPathParser.PathFunctionContext context);
 	/// <summary>
 	/// Enter a parse tree produced by the <c>PathStringIndexer</c>
 	/// labeled alternative in <see cref="BindingPathParser.path"/>.
-	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void EnterPathStringIndexer([NotNull] BindingPathParser.PathStringIndexerContext context) { }
+	void EnterPathStringIndexer([NotNull] BindingPathParser.PathStringIndexerContext context);
 	/// <summary>
 	/// Exit a parse tree produced by the <c>PathStringIndexer</c>
 	/// labeled alternative in <see cref="BindingPathParser.path"/>.
-	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void ExitPathStringIndexer([NotNull] BindingPathParser.PathStringIndexerContext context) { }
+	void ExitPathStringIndexer([NotNull] BindingPathParser.PathStringIndexerContext context);
 	/// <summary>
 	/// Enter a parse tree produced by the <c>PathIdentifier</c>
 	/// labeled alternative in <see cref="BindingPathParser.path"/>.
-	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void EnterPathIdentifier([NotNull] BindingPathParser.PathIdentifierContext context) { }
+	void EnterPathIdentifier([NotNull] BindingPathParser.PathIdentifierContext context);
 	/// <summary>
 	/// Exit a parse tree produced by the <c>PathIdentifier</c>
 	/// labeled alternative in <see cref="BindingPathParser.path"/>.
-	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void ExitPathIdentifier([NotNull] BindingPathParser.PathIdentifierContext context) { }
+	void ExitPathIdentifier([NotNull] BindingPathParser.PathIdentifierContext context);
 	/// <summary>
 	/// Enter a parse tree produced by the <c>PathCastPath</c>
 	/// labeled alternative in <see cref="BindingPathParser.path"/>.
-	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void EnterPathCastPath([NotNull] BindingPathParser.PathCastPathContext context) { }
+	void EnterPathCastPath([NotNull] BindingPathParser.PathCastPathContext context);
 	/// <summary>
 	/// Exit a parse tree produced by the <c>PathCastPath</c>
 	/// labeled alternative in <see cref="BindingPathParser.path"/>.
-	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void ExitPathCastPath([NotNull] BindingPathParser.PathCastPathContext context) { }
+	void ExitPathCastPath([NotNull] BindingPathParser.PathCastPathContext context);
 	/// <summary>
 	/// Enter a parse tree produced by the <c>PathStaticIdentifier</c>
 	/// labeled alternative in <see cref="BindingPathParser.path"/>.
-	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void EnterPathStaticIdentifier([NotNull] BindingPathParser.PathStaticIdentifierContext context) { }
+	void EnterPathStaticIdentifier([NotNull] BindingPathParser.PathStaticIdentifierContext context);
 	/// <summary>
 	/// Exit a parse tree produced by the <c>PathStaticIdentifier</c>
 	/// labeled alternative in <see cref="BindingPathParser.path"/>.
-	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void ExitPathStaticIdentifier([NotNull] BindingPathParser.PathStaticIdentifierContext context) { }
+	void ExitPathStaticIdentifier([NotNull] BindingPathParser.PathStaticIdentifierContext context);
 	/// <summary>
 	/// Enter a parse tree produced by the <c>PathDotIdentifier</c>
 	/// labeled alternative in <see cref="BindingPathParser.path"/>.
-	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void EnterPathDotIdentifier([NotNull] BindingPathParser.PathDotIdentifierContext context) { }
+	void EnterPathDotIdentifier([NotNull] BindingPathParser.PathDotIdentifierContext context);
 	/// <summary>
 	/// Exit a parse tree produced by the <c>PathDotIdentifier</c>
 	/// labeled alternative in <see cref="BindingPathParser.path"/>.
-	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void ExitPathDotIdentifier([NotNull] BindingPathParser.PathDotIdentifierContext context) { }
+	void ExitPathDotIdentifier([NotNull] BindingPathParser.PathDotIdentifierContext context);
 	/// <summary>
 	/// Enter a parse tree produced by the <c>PathDotAttached</c>
 	/// labeled alternative in <see cref="BindingPathParser.path"/>.
-	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void EnterPathDotAttached([NotNull] BindingPathParser.PathDotAttachedContext context) { }
+	void EnterPathDotAttached([NotNull] BindingPathParser.PathDotAttachedContext context);
 	/// <summary>
 	/// Exit a parse tree produced by the <c>PathDotAttached</c>
 	/// labeled alternative in <see cref="BindingPathParser.path"/>.
-	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void ExitPathDotAttached([NotNull] BindingPathParser.PathDotAttachedContext context) { }
+	void ExitPathDotAttached([NotNull] BindingPathParser.PathDotAttachedContext context);
 	/// <summary>
 	/// Enter a parse tree produced by the <c>FunctionParameterInvalid</c>
 	/// labeled alternative in <see cref="BindingPathParser.function_param"/>.
-	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void EnterFunctionParameterInvalid([NotNull] BindingPathParser.FunctionParameterInvalidContext context) { }
+	void EnterFunctionParameterInvalid([NotNull] BindingPathParser.FunctionParameterInvalidContext context);
 	/// <summary>
 	/// Exit a parse tree produced by the <c>FunctionParameterInvalid</c>
 	/// labeled alternative in <see cref="BindingPathParser.function_param"/>.
-	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void ExitFunctionParameterInvalid([NotNull] BindingPathParser.FunctionParameterInvalidContext context) { }
+	void ExitFunctionParameterInvalid([NotNull] BindingPathParser.FunctionParameterInvalidContext context);
 	/// <summary>
 	/// Enter a parse tree produced by the <c>FunctionParamPath</c>
 	/// labeled alternative in <see cref="BindingPathParser.function_param"/>.
-	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void EnterFunctionParamPath([NotNull] BindingPathParser.FunctionParamPathContext context) { }
+	void EnterFunctionParamPath([NotNull] BindingPathParser.FunctionParamPathContext context);
 	/// <summary>
 	/// Exit a parse tree produced by the <c>FunctionParamPath</c>
 	/// labeled alternative in <see cref="BindingPathParser.function_param"/>.
-	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void ExitFunctionParamPath([NotNull] BindingPathParser.FunctionParamPathContext context) { }
+	void ExitFunctionParamPath([NotNull] BindingPathParser.FunctionParamPathContext context);
 	/// <summary>
 	/// Enter a parse tree produced by the <c>FunctionParamBool</c>
 	/// labeled alternative in <see cref="BindingPathParser.function_param"/>.
-	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void EnterFunctionParamBool([NotNull] BindingPathParser.FunctionParamBoolContext context) { }
+	void EnterFunctionParamBool([NotNull] BindingPathParser.FunctionParamBoolContext context);
 	/// <summary>
 	/// Exit a parse tree produced by the <c>FunctionParamBool</c>
 	/// labeled alternative in <see cref="BindingPathParser.function_param"/>.
-	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void ExitFunctionParamBool([NotNull] BindingPathParser.FunctionParamBoolContext context) { }
+	void ExitFunctionParamBool([NotNull] BindingPathParser.FunctionParamBoolContext context);
 	/// <summary>
 	/// Enter a parse tree produced by the <c>FunctionParamNumber</c>
 	/// labeled alternative in <see cref="BindingPathParser.function_param"/>.
-	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void EnterFunctionParamNumber([NotNull] BindingPathParser.FunctionParamNumberContext context) { }
+	void EnterFunctionParamNumber([NotNull] BindingPathParser.FunctionParamNumberContext context);
 	/// <summary>
 	/// Exit a parse tree produced by the <c>FunctionParamNumber</c>
 	/// labeled alternative in <see cref="BindingPathParser.function_param"/>.
-	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void ExitFunctionParamNumber([NotNull] BindingPathParser.FunctionParamNumberContext context) { }
+	void ExitFunctionParamNumber([NotNull] BindingPathParser.FunctionParamNumberContext context);
 	/// <summary>
 	/// Enter a parse tree produced by the <c>FunctionParamString</c>
 	/// labeled alternative in <see cref="BindingPathParser.function_param"/>.
-	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void EnterFunctionParamString([NotNull] BindingPathParser.FunctionParamStringContext context) { }
+	void EnterFunctionParamString([NotNull] BindingPathParser.FunctionParamStringContext context);
 	/// <summary>
 	/// Exit a parse tree produced by the <c>FunctionParamString</c>
 	/// labeled alternative in <see cref="BindingPathParser.function_param"/>.
-	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void ExitFunctionParamString([NotNull] BindingPathParser.FunctionParamStringContext context) { }
+	void ExitFunctionParamString([NotNull] BindingPathParser.FunctionParamStringContext context);
 	/// <summary>
 	/// Enter a parse tree produced by the <c>FunctionParamNullValue</c>
 	/// labeled alternative in <see cref="BindingPathParser.function_param"/>.
-	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void EnterFunctionParamNullValue([NotNull] BindingPathParser.FunctionParamNullValueContext context) { }
+	void EnterFunctionParamNullValue([NotNull] BindingPathParser.FunctionParamNullValueContext context);
 	/// <summary>
 	/// Exit a parse tree produced by the <c>FunctionParamNullValue</c>
 	/// labeled alternative in <see cref="BindingPathParser.function_param"/>.
-	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void ExitFunctionParamNullValue([NotNull] BindingPathParser.FunctionParamNullValueContext context) { }
-
-	/// <inheritdoc/>
-	/// <remarks>The default implementation does nothing.</remarks>
-	public virtual void EnterEveryRule([NotNull] ParserRuleContext context) { }
-	/// <inheritdoc/>
-	/// <remarks>The default implementation does nothing.</remarks>
-	public virtual void ExitEveryRule([NotNull] ParserRuleContext context) { }
-	/// <inheritdoc/>
-	/// <remarks>The default implementation does nothing.</remarks>
-	public virtual void VisitTerminal([NotNull] ITerminalNode node) { }
-	/// <inheritdoc/>
-	/// <remarks>The default implementation does nothing.</remarks>
-	public virtual void VisitErrorNode([NotNull] IErrorNode node) { }
+	void ExitFunctionParamNullValue([NotNull] BindingPathParser.FunctionParamNullValueContext context);
 }
