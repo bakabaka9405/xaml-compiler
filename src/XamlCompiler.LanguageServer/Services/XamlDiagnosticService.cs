@@ -63,8 +63,21 @@ public class XamlDiagnosticService
         var typeUniverse = new XamlTypeUniverse(useManagedProjections: false);
 
         var loadedAssemblies = new List<System.Reflection.Assembly>();
+        int skippedCount = 0;
+        int failedCount = 0;
         foreach (var filePath in assemblyPaths)
         {
+            // Guard: skip missing/deleted files to avoid FileNotFoundException
+            // and prevent a single transient project WinMD failure from blocking
+            // all remaining assemblies.
+            if (!System.IO.File.Exists(filePath))
+            {
+                System.Diagnostics.Debug.WriteLine(
+                    $"Skipping missing assembly '{filePath}'");
+                skippedCount++;
+                continue;
+            }
+
             try
             {
                 var asm = typeUniverse.LoadAssemblyFromFile(filePath);
@@ -74,8 +87,13 @@ public class XamlDiagnosticService
             {
                 System.Diagnostics.Debug.WriteLine(
                     $"Failed to load assembly '{filePath}': {ex.Message}");
+                failedCount++;
             }
         }
+
+        System.Diagnostics.Debug.WriteLine(
+            $"Schema context: loaded {loadedAssemblies.Count} assemblies " +
+            $"({skippedCount} missing, {failedCount} failed)");
 
         if (loadedAssemblies.Count == 0)
             return;

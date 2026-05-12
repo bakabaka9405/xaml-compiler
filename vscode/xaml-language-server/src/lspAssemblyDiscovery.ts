@@ -15,6 +15,21 @@ export interface LspAssemblyContext {
     sourceDir: string;
 }
 
+/**
+ * Result of a project WinMD discovery attempt.
+ *
+ * The {@code warnings} array carries human-readable diagnostics that explain
+ * why discovery returned empty or ambiguous results. These are intended for
+ * developer debugging (e.g. via the VS Code output channel), not for end-user
+ * display.
+ */
+export interface DiscoverProjectWinmdsResult {
+    /** Discovered project WinMD absolute paths */
+    paths: string[];
+    /** Human-readable warnings for debugging (not shown to end users) */
+    warnings: string[];
+}
+
 export interface XmakeVersions {
     winAppSdk: string;
     webView2: string;
@@ -517,6 +532,315 @@ export function findXamlSrcDir(workspaceRoot: string, maxDepth: number = 4): str
 }
 
 // ---------------------------------------------------------------------------
+// Project WinMD discovery helpers
+// ---------------------------------------------------------------------------
+
+/**
+ * Resolve the root directory where WinUI3 xmake places merged WinMD outputs.
+ * Returns {@code workspaceRoot/build/.gens}.
+ */
+export function resolveBuildGensRoot(workspaceRoot: string): string {
+    return path.join(workspaceRoot, 'build', '.gens');
+}
+
+/**
+ * Locate the nearest project-level {@code xmake.lua} file.
+ *
+ * Strategy:
+ * - When {@code xamlPath} is provided, walk UP from that file's parent directory
+ *   looking for an {@code xmake.lua} (max 5 levels up).
+ * - When not provided, check the workspace root for an {@code xmake.lua} first,
+ *   then scan {@code demo/subdir/xmake.lua} subdirectories.
+ *
+ * @param workspaceRoot - The workspace root directory.
+ * @param xamlPath - Optional path to a XAML file; used as the upward search seed.
+ * @returns The full path to the nearest {@code xmake.lua}, or {@code null}.
+ */
+export function findProjectXmakeLua(workspaceRoot: string, xamlPath?: string): string | null {
+    // Strategy 1: walk up from xamlPath
+    if (xamlPath) {
+        let dir = path.dirname(xamlPath);
+        for (let i = 0; i < 5; i++) {
+            const luaPath = path.join(dir, 'xmake.lua');
+            if (fs.existsSync(luaPath)) {
+                return luaPath;
+            }
+            const parent = path.dirname(dir);
+            if (parent === dir) {
+                break; // reached filesystem root
+            }
+            dir = parent;
+        }
+        return null;
+    }
+
+    // Strategy 2: workspace root xmake.lua
+    const rootLua = path.join(workspaceRoot, 'xmake.lua');
+    if (fs.existsSync(rootLua)) {
+        return rootLua;
+    }
+
+    // Strategy 3: demo/*/xmake.lua
+    try {
+        const entries = fs.readdirSync(workspaceRoot, { withFileTypes: true });
+        for (const entry of entries) {
+            if (!entry.isDirectory()) {
+                continue;
+            }
+            const demoLua = path.join(workspaceRoot, entry.name, 'xmake.lua');
+            if (fs.existsSync(demoLua)) {
+                return demoLua;
+            }
+        }
+    } catch {
+        // readdir failed; no match
+    }
+
+    return null;
+}
+
+/**
+ * Parse an xmake.lua file for the first {@code target("...")} declaration and
+ * return the target name.
+ *
+ * @param luaPath - Path to the xmake.lua file.
+ * @returns The target name (e.g. {@code "demo.hello"}), or {@code null}.
+ */
+export function extractTargetName(luaPath: string): string | null {
+    try {
+        const content = fs.readFileSync(luaPath, 'utf-8');
+        const match = content.match(/target\("([^"]+)"\)/);
+        return match ? match[1] : null;
+    } catch {
+        return null;
+    }
+}
+
+/**
+ * Parse an xmake.lua file for a {@code set_values("winui3.namespace", "xxx")}
+ * declaration and return the namespace value.
+ *
+ * @param luaPath - Path to the xmake.lua file.
+ * @returns The namespace value, or {@code null} if not found.
+ */
+export function extractNamespaceFromXmakeLua(luaPath: string): string | null {
+    try {
+        const content = fs.readFileSync(luaPath, 'utf-8');
+        const match = content.match(
+            /set_values\("winui3\.namespace",\s*"(\w+)"\)/,
+        );
+        return match ? match[1] : null;
+    } catch {
+        return null;
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Project WinMD discovery: build/.gens scanner
+// ---------------------------------------------------------------------------
+
+/**
+ * Discover project-local WinMD files from winui3-xmake build outputs.
+ *
+ * Scans the {@code build/.gens/<target>/winmd_merged/} directory structure
+ * and returns paths to WinMD files that match the given project namespace.
+ *
+ * Phase 1 — Guard: return empty when {@code build/.gens} is absent.
+ * Phase 2 — Scan: iterate each target subdirectory for
+ *           {@code winmd_merged/*.winmd} files.
+ * Phase 3 — Prefer exact match: if a WinMD file is named
+ *           {@code <namespace>.winmd}, return only those.
+ * Phase 4 — Fallback: when no exact match exists, return all discovered
+ *           WinMD files as ambiguous candidates.
+ * Phase 5 — Deduplication: case-insensitive path normalization.
+ *
+ * @param workspaceRoot - The workspace root directory.
+ * @param namespace     - The target namespace to match against WinMD
+ *                        filenames (e.g., {@code "hello"} matches
+ *                        {@code hello.winmd}).
+ * @returns An array of normalised, deduplicated WinMD paths.
+ */
+export function discoverProjectWinmds(
+    workspaceRoot: string,
+    namespace: string,
+): string[] {
+    const gensRoot = resolveBuildGensRoot(workspaceRoot);
+
+    // Phase 1: guard — build/.gens may not exist yet (pre-build)
+    if (!fs.existsSync(gensRoot)) {
+        return [];
+    }
+
+    const allCandidates: string[] = [];
+
+    // Phase 2: scan each target subdirectory under build/.gens/
+    let targetEntries: fs.Dirent[];
+    try {
+        targetEntries = fs.readdirSync(gensRoot, { withFileTypes: true });
+    } catch {
+        return [];
+    }
+
+    for (const targetEntry of targetEntries) {
+        if (!targetEntry.isDirectory()) {
+            continue;
+        }
+
+        const winmdMergedDir = path.join(
+            gensRoot,
+            targetEntry.name,
+            'winmd_merged',
+        );
+        if (!fs.existsSync(winmdMergedDir)) {
+            continue;
+        }
+
+        try {
+            const files = fs.readdirSync(winmdMergedDir, {
+                withFileTypes: true,
+            });
+            for (const file of files) {
+                if (!file.isFile()) {
+                    continue;
+                }
+                if (file.name.toLowerCase().endsWith('.winmd')) {
+                    allCandidates.push(
+                        path.normalize(path.join(winmdMergedDir, file.name)),
+                    );
+                }
+            }
+        } catch {
+            // Permission / access error; skip this target directory
+            continue;
+        }
+    }
+
+    // Phase 5: case-insensitive deduplication
+    const seen = new Set<string>();
+    const unique: string[] = [];
+    for (const candidate of allCandidates) {
+        const lowerKey = candidate.toLowerCase();
+        if (!seen.has(lowerKey)) {
+            seen.add(lowerKey);
+            unique.push(candidate);
+        }
+    }
+
+    // Phase 3: prefer exact namespace match
+    const exactMatches = unique.filter(
+        p => path.basename(p, '.winmd') === namespace,
+    );
+    if (exactMatches.length > 0) {
+        return exactMatches;
+    }
+
+    // Phase 4: ambiguous fallback — return all discovered WinMD files
+    return unique;
+}
+
+// ---------------------------------------------------------------------------
+// Project WinMD discovery: logging wrapper
+// ---------------------------------------------------------------------------
+
+/**
+ * Wraps {@link discoverProjectWinmds} with diagnostic logging that explains
+ * discovery decisions through the {@link DiscoverProjectWinmdsResult}
+ * {@code warnings} array.
+ *
+ * Inspection logic (post-call):
+ * - Cold-start (no {@code build/.gens}): returns empty result with **zero**
+ *   warnings — this is a normal pre-build state, not an error.
+ * - Exact match: at least one returned path's basename equals
+ *   {@code namespace}; returns paths with no warnings.
+ * - Ambiguous: returned paths exist but none match the namespace exactly;
+ *   adds a warning with the candidate count.
+ * - No results with structure: inspects the directory tree under
+ *   {@code build/.gens} to distinguish "no winmd_merged dirs" from
+ *   "no .winmd files in winmd_merged".
+ *
+ * @param workspaceRoot - The workspace root directory.
+ * @param namespace     - The target namespace for candidate matching.
+ * @returns A {@link DiscoverProjectWinmdsResult} with discovered paths and
+ *          diagnostic warnings.
+ */
+export function discoverProjectWinmdsWithLogging(
+    workspaceRoot: string,
+    namespace: string,
+): DiscoverProjectWinmdsResult {
+    const gensRoot = resolveBuildGensRoot(workspaceRoot);
+
+    // Phase 1: cold-start — build/.gens does not exist (normal pre-build).
+    if (!fs.existsSync(gensRoot)) {
+        return { paths: [], warnings: [] };
+    }
+
+    // Phase 2: call the scanner
+    const paths = discoverProjectWinmds(workspaceRoot, namespace);
+
+    // Phase 3: determine result quality from returned paths
+    if (paths.length > 0) {
+        const hasExactMatch = paths.some(
+            p => path.basename(p, '.winmd') === namespace,
+        );
+        if (hasExactMatch) {
+            // Exact match — successful discovery, no warning.
+            return { paths, warnings: [] };
+        }
+        // Ambiguous — candidates exist but no exact namespace match.
+        const msg =
+            `Ambiguous project WinMD candidates for namespace '${namespace}': found ${paths.length} candidates`;
+        console.log('[XAML LS]', msg);
+        return { paths, warnings: [msg] };
+    }
+
+    // Phase 4: empty result — inspect directory structure for diagnostics.
+    let hasWinmdMerged = false;
+    let hasWinmdFiles = false;
+
+    try {
+        const targetDirs = fs
+            .readdirSync(gensRoot, { withFileTypes: true })
+            .filter(e => e.isDirectory());
+
+        for (const targetDir of targetDirs) {
+            const mergedDir = path.join(
+                gensRoot,
+                targetDir.name,
+                'winmd_merged',
+            );
+            if (!fs.existsSync(mergedDir)) {
+                continue;
+            }
+            hasWinmdMerged = true;
+
+            try {
+                const files = fs.readdirSync(mergedDir);
+                if (files.some(f => f.toLowerCase().endsWith('.winmd'))) {
+                    hasWinmdFiles = true;
+                    break;
+                }
+            } catch {
+                // Permission / access error; skip this target
+                continue;
+            }
+        }
+    } catch {
+        // gensRoot read failed; fall through to warning logic below
+    }
+
+    if (!hasWinmdMerged) {
+        const msg = 'No winmd_merged directories found under build/.gens';
+        console.log('[XAML LS]', msg);
+        return { paths: [], warnings: [msg] };
+    }
+
+    // winmd_merged exists but contains no .winmd files
+    const msg = 'No .winmd files found in build/.gens/*/winmd_merged/';
+    console.log('[XAML LS]', msg);
+    return { paths: [], warnings: [msg] };
+}
+
+// ---------------------------------------------------------------------------
 // Namespace extraction
 // ---------------------------------------------------------------------------
 
@@ -541,16 +865,9 @@ export function extractNamespace(workspaceRoot: string): string {
             const childDir = path.join(workspaceRoot, entry.name);
             const directLua = path.join(childDir, 'xmake.lua');
             if (fs.existsSync(directLua)) {
-                try {
-                    const content = fs.readFileSync(directLua, 'utf-8');
-                    const nsMatch = content.match(
-                        /set_values\("winui3\.namespace",\s*"(\w+)"\)/,
-                    );
-                    if (nsMatch) {
-                        return nsMatch[1];
-                    }
-                } catch {
-                    // read error; continue
+                const ns = extractNamespaceFromXmakeLua(directLua);
+                if (ns !== null) {
+                    return ns;
                 }
             }
 
@@ -568,16 +885,9 @@ export function extractNamespace(workspaceRoot: string): string {
                         continue;
                     }
 
-                    try {
-                        const content = fs.readFileSync(subLua, 'utf-8');
-                        const nsMatch = content.match(
-                            /set_values\("winui3\.namespace",\s*"(\w+)"\)/,
-                        );
-                        if (nsMatch) {
-                            return nsMatch[1];
-                        }
-                    } catch {
-                        // read error; continue
+                    const ns = extractNamespaceFromXmakeLua(subLua);
+                    if (ns !== null) {
+                        return ns;
                     }
                 }
             } catch {
@@ -776,7 +1086,16 @@ export async function discoverLspContext(
         // Phase 5: namespace extraction (multi-strategy)
         const namespace = extractNamespace(workspaceRoot);
 
-        // Phase 6: aggregate results
+        // Phase 5.5: discover project-local WinMDs
+        const projectResult = discoverProjectWinmdsWithLogging(
+            workspaceRoot,
+            namespace,
+        );
+        for (const warning of projectResult.warnings) {
+            console.log('[XAML LS]', warning);
+        }
+
+        // Phase 6: aggregate results (global then project)
         const referenceAssemblies: string[] = [
             ...platformWinmds,
             ...appSdkWinmds,
@@ -784,6 +1103,15 @@ export async function discoverLspContext(
         ];
         if (webView2Winmd !== null) {
             referenceAssemblies.push(webView2Winmd);
+        }
+
+        // Append project WinMDs (cross-deduplicated against global refs)
+        const seen = new Set(referenceAssemblies.map(p => p.toLowerCase()));
+        for (const projPath of projectResult.paths) {
+            if (!seen.has(projPath.toLowerCase())) {
+                seen.add(projPath.toLowerCase());
+                referenceAssemblies.push(projPath);
+            }
         }
 
         return {

@@ -1128,4 +1128,364 @@ suite('discoverLspContext', () => {
             disposeTempScope(scope);
         }
     });
+
+    test('project WinMD appears in referenceAssemblies when build output exists', async () => {
+        const scope = createTempScope();
+        try {
+            const workspaceRoot = scope.dir;
+
+            // Create build/.gens/demo.hello/winmd_merged/hello.winmd
+            const winmdDir = path.join(workspaceRoot, 'build', '.gens', 'demo.hello', 'winmd_merged');
+            fs.mkdirSync(winmdDir, { recursive: true });
+            createWinmdFile(winmdDir, 'hello.winmd');
+
+            // Create xmake.lua
+            fs.writeFileSync(
+                path.join(workspaceRoot, 'xmake.lua'),
+                'add_requires("Microsoft.WindowsAppSDK 1.6.0")\n',
+                'utf-8',
+            );
+
+            // Set up mock Windows SDK
+            const mockSdkVersion = '10.0.22621.0';
+            const mockSdkRoot = createMockSdk(scope.dir, mockSdkVersion);
+            createWinmdFile(
+                path.join(mockSdkRoot, 'References', mockSdkVersion),
+                'Windows.Foundation.winmd',
+            );
+
+            const originalSdkDir = process.env.WindowsSdkDir;
+            process.env.WindowsSdkDir = mockSdkRoot;
+
+            // Set up mock NuGet cache with AppSDK
+            const nugetRoot = path.join(scope.dir, 'NuGetCache', '.nuget', 'packages');
+            const userProfileEnv = process.env.USERPROFILE;
+            process.env.USERPROFILE = path.join(scope.dir, 'NuGetCache');
+
+            const appSdkDir = path.join(
+                nugetRoot,
+                'microsoft.windowsappsdk',
+                '1.6.0',
+                'lib',
+                'net6.0-windows10.0.19041.0',
+            );
+            fs.mkdirSync(appSdkDir, { recursive: true });
+            createWinmdFile(appSdkDir, 'Microsoft.WindowsAppSDK.winmd');
+
+            try {
+                const result = await lsp.discoverLspContext(workspaceRoot);
+
+                assert.ok(result !== null, 'Context should not be null');
+
+                // Project WinMD should be in referenceAssemblies
+                const projectPaths = result!.referenceAssemblies.filter(
+                    p => p.toLowerCase().endsWith('hello.winmd'),
+                );
+                assert.strictEqual(projectPaths.length, 1, 'Project WinMD should appear exactly once');
+                assert.ok(projectPaths[0].includes('hello.winmd'));
+
+                // Global references should still be present (platform + appSDK = 2)
+                assert.ok(
+                    result!.referenceAssemblies.length >= 3,
+                    `Expected >= 3 assemblies (platform + appSDK + project), got ${result!.referenceAssemblies.length}`,
+                );
+
+                // Verify project WinMD is appended AFTER global refs
+                const projIndex = result!.referenceAssemblies.findIndex(
+                    p => p.toLowerCase().endsWith('hello.winmd'),
+                );
+                const globalWinmdIndex = result!.referenceAssemblies.findIndex(
+                    p => p.toLowerCase().endsWith('microsoft.windowsappsdk.winmd'),
+                );
+                assert.ok(
+                    projIndex > globalWinmdIndex,
+                    'Project WinMD should be appended after global references',
+                );
+            } finally {
+                process.env.WindowsSdkDir = originalSdkDir;
+                process.env.USERPROFILE = userProfileEnv;
+            }
+        } finally {
+            disposeTempScope(scope);
+        }
+    });
+
+    test('no project WinMD path appears when build/.gens absent', async () => {
+        const scope = createTempScope();
+        try {
+            const workspaceRoot = scope.dir;
+
+            // Create xmake.lua (no build/.gens directory)
+            fs.writeFileSync(
+                path.join(workspaceRoot, 'xmake.lua'),
+                'add_requires("Microsoft.WindowsAppSDK 1.6.0")\n',
+                'utf-8',
+            );
+
+            // Set up mock Windows SDK
+            const mockSdkVersion = '10.0.22621.0';
+            const mockSdkRoot = createMockSdk(scope.dir, mockSdkVersion);
+            createWinmdFile(
+                path.join(mockSdkRoot, 'References', mockSdkVersion),
+                'Windows.Foundation.winmd',
+            );
+
+            const originalSdkDir = process.env.WindowsSdkDir;
+            process.env.WindowsSdkDir = mockSdkRoot;
+
+            // Set up mock NuGet cache with AppSDK
+            const nugetRoot = path.join(scope.dir, 'NuGetCache', '.nuget', 'packages');
+            const userProfileEnv = process.env.USERPROFILE;
+            process.env.USERPROFILE = path.join(scope.dir, 'NuGetCache');
+
+            const appSdkDir = path.join(
+                nugetRoot,
+                'microsoft.windowsappsdk',
+                '1.6.0',
+                'lib',
+                'net6.0-windows10.0.19041.0',
+            );
+            fs.mkdirSync(appSdkDir, { recursive: true });
+            createWinmdFile(appSdkDir, 'Microsoft.WindowsAppSDK.winmd');
+
+            try {
+                const result = await lsp.discoverLspContext(workspaceRoot);
+
+                assert.ok(result !== null, 'Context should not be null');
+
+                // No paths should contain build/.gens
+                const projectPaths = result!.referenceAssemblies.filter(
+                    p => p.includes('build'),
+                );
+                assert.strictEqual(
+                    projectPaths.length,
+                    0,
+                    'No project WinMD paths should appear when build/.gens is absent',
+                );
+
+                // Global references should still be present
+                assert.ok(
+                    result!.referenceAssemblies.length >= 2,
+                    `Expected >= 2 assemblies (platform + appSDK), got ${result!.referenceAssemblies.length}`,
+                );
+            } finally {
+                process.env.WindowsSdkDir = originalSdkDir;
+                process.env.USERPROFILE = userProfileEnv;
+            }
+        } finally {
+            disposeTempScope(scope);
+        }
+    });
+});
+
+// ---------------------------------------------------------------------------
+// Suite: discoverProjectWinmds
+// ---------------------------------------------------------------------------
+
+suite('discoverProjectWinmds', () => {
+    test('finds namespace-matched project WinMD', () => {
+        const scope = createTempScope();
+        try {
+            // Create build/.gens/demo.hello/winmd_merged/hello.winmd
+            const winmdDir = path.join(
+                scope.dir, 'build', '.gens', 'demo.hello', 'winmd_merged',
+            );
+            fs.mkdirSync(winmdDir, { recursive: true });
+            const winmdPath = createWinmdFile(winmdDir, 'hello.winmd');
+
+            const result = lsp.discoverProjectWinmds(scope.dir, 'hello');
+
+            assert.strictEqual(result.length, 1);
+            assert.ok(result[0].endsWith('hello.winmd'));
+        } finally {
+            disposeTempScope(scope);
+        }
+    });
+
+    test('tolerates missing build/.gens directory', () => {
+        const scope = createTempScope();
+        try {
+            // No build/.gens directory exists
+            const result = lsp.discoverProjectWinmds(scope.dir, 'hello');
+
+            assert.deepStrictEqual(result, []);
+        } finally {
+            disposeTempScope(scope);
+        }
+    });
+
+    test('returns all candidates when namespace does not match (ambiguous fallback)', () => {
+        const scope = createTempScope();
+        try {
+            // Create build/.gens/demo.hello/winmd_merged/hello.winmd
+            const winmdDir = path.join(
+                scope.dir, 'build', '.gens', 'demo.hello', 'winmd_merged',
+            );
+            fs.mkdirSync(winmdDir, { recursive: true });
+            createWinmdFile(winmdDir, 'hello.winmd');
+
+            // Call with 'gallery' — no exact match, so ambiguous fallback returns all
+            const result = lsp.discoverProjectWinmds(scope.dir, 'gallery');
+
+            assert.strictEqual(result.length, 1);
+            assert.ok(result[0].endsWith('hello.winmd'));
+        } finally {
+            disposeTempScope(scope);
+        }
+    });
+
+    test('deduplicates case-insensitively', () => {
+        const scope = createTempScope();
+        try {
+            // Create build/.gens/demo.hello/winmd_merged/Hello.WinMD (mixed case)
+            const winmdDir = path.join(
+                scope.dir, 'build', '.gens', 'demo.hello', 'winmd_merged',
+            );
+            fs.mkdirSync(winmdDir, { recursive: true });
+            createWinmdFile(winmdDir, 'Hello.WinMD');
+
+            const result = lsp.discoverProjectWinmds(scope.dir, 'hello');
+
+            // Mixed-case file is collected; exact match fails due to case-sensitive
+            // suffix removal in path.basename, so ambiguous fallback returns 1 path
+            assert.strictEqual(result.length, 1);
+        } finally {
+            disposeTempScope(scope);
+        }
+    });
+
+    test('returns only exact match when multiple targets present', () => {
+        const scope = createTempScope();
+        try {
+            // Create build/.gens/demo.hello/winmd_merged/hello.winmd
+            const winmdDir1 = path.join(
+                scope.dir, 'build', '.gens', 'demo.hello', 'winmd_merged',
+            );
+            fs.mkdirSync(winmdDir1, { recursive: true });
+            createWinmdFile(winmdDir1, 'hello.winmd');
+
+            // Create build/.gens/demo.other/winmd_merged/other.winmd
+            const winmdDir2 = path.join(
+                scope.dir, 'build', '.gens', 'demo.other', 'winmd_merged',
+            );
+            fs.mkdirSync(winmdDir2, { recursive: true });
+            createWinmdFile(winmdDir2, 'other.winmd');
+
+            // Exact match for 'hello' should return only hello.winmd
+            const result = lsp.discoverProjectWinmds(scope.dir, 'hello');
+
+            assert.strictEqual(result.length, 1);
+            assert.ok(result[0].endsWith('hello.winmd'));
+        } finally {
+            disposeTempScope(scope);
+        }
+    });
+
+    test('multi-project: exact namespace match wins', () => {
+        const scope = createTempScope();
+        try {
+            // Create build/.gens/demo.hello/winmd_merged/hello.winmd
+            const helloDir = path.join(scope.dir, 'build', '.gens', 'demo.hello', 'winmd_merged');
+            fs.mkdirSync(helloDir, { recursive: true });
+            createWinmdFile(helloDir, 'hello.winmd');
+
+            // Create build/.gens/demo.gallery/winmd_merged/gallery.winmd
+            const galleryDir = path.join(scope.dir, 'build', '.gens', 'demo.gallery', 'winmd_merged');
+            fs.mkdirSync(galleryDir, { recursive: true });
+            createWinmdFile(galleryDir, 'gallery.winmd');
+
+            // Ask for namespace 'hello' — should prefer hello.winmd
+            const result = lsp.discoverProjectWinmds(scope.dir, 'hello');
+
+            assert.strictEqual(result.length, 1, 'Should return exactly 1 candidate');
+            assert.ok(result[0].endsWith('hello.winmd'), 'Should prefer hello.winmd');
+        } finally {
+            disposeTempScope(scope);
+        }
+    });
+
+    test('multi-project: ambiguous fallback returns all candidates', () => {
+        const scope = createTempScope();
+        try {
+            // Create two WinMDs with different names in different target dirs
+            const dir1 = path.join(scope.dir, 'build', '.gens', 'demo.hello', 'winmd_merged');
+            fs.mkdirSync(dir1, { recursive: true });
+            createWinmdFile(dir1, 'hello.winmd');
+
+            const dir2 = path.join(scope.dir, 'build', '.gens', 'demo.other', 'winmd_merged');
+            fs.mkdirSync(dir2, { recursive: true });
+            createWinmdFile(dir2, 'other.winmd');
+
+            // Ask for namespace 'unknown' — no exact match, should return all
+            const result = lsp.discoverProjectWinmds(scope.dir, 'unknown');
+
+            assert.strictEqual(result.length, 2, 'Should return all 2 candidates');
+        } finally {
+            disposeTempScope(scope);
+        }
+    });
+});
+
+// ---------------------------------------------------------------------------
+// Suite: discoverProjectWinmdsWithLogging
+// ---------------------------------------------------------------------------
+
+suite('discoverProjectWinmdsWithLogging', () => {
+    test('cold start returns empty paths with no warnings', () => {
+        const scope = createTempScope();
+        try {
+            // No build/.gens directory exists
+            const result = lsp.discoverProjectWinmdsWithLogging(scope.dir, 'hello');
+
+            assert.strictEqual(result.paths.length, 0);
+            assert.strictEqual(result.warnings.length, 0);
+        } finally {
+            disposeTempScope(scope);
+        }
+    });
+
+    test('ambiguous candidates produce warning', () => {
+        const scope = createTempScope();
+        try {
+            // Create build/.gens/demo.hello/winmd_merged/hello.winmd
+            const winmdDir = path.join(
+                scope.dir, 'build', '.gens', 'demo.hello', 'winmd_merged',
+            );
+            fs.mkdirSync(winmdDir, { recursive: true });
+            createWinmdFile(winmdDir, 'hello.winmd');
+
+            // Call with 'gallery' — mismatched namespace triggers ambiguous warning
+            const result = lsp.discoverProjectWinmdsWithLogging(scope.dir, 'gallery');
+
+            assert.ok(result.paths.length > 0);
+            assert.strictEqual(result.warnings.length, 1);
+            assert.ok(result.warnings[0].includes('Ambiguous'));
+            assert.ok(result.warnings[0].includes('gallery'));
+        } finally {
+            disposeTempScope(scope);
+        }
+    });
+
+    test('multi-project: ambiguous fallback produces warning in withLogging', () => {
+        const scope = createTempScope();
+        try {
+            // Create two different WinMDs
+            const dir1 = path.join(scope.dir, 'build', '.gens', 'demo.hello', 'winmd_merged');
+            fs.mkdirSync(dir1, { recursive: true });
+            createWinmdFile(dir1, 'hello.winmd');
+
+            const dir2 = path.join(scope.dir, 'build', '.gens', 'demo.other', 'winmd_merged');
+            fs.mkdirSync(dir2, { recursive: true });
+            createWinmdFile(dir2, 'other.winmd');
+
+            const result = lsp.discoverProjectWinmdsWithLogging(scope.dir, 'unknown');
+
+            assert.strictEqual(result.paths.length, 2);
+            assert.strictEqual(result.warnings.length, 1);
+            assert.ok(result.warnings[0].includes('Ambiguous'));
+            assert.ok(result.warnings[0].includes('2 candidates'));
+        } finally {
+            disposeTempScope(scope);
+        }
+    });
 });

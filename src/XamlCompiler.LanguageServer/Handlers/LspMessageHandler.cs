@@ -129,6 +129,43 @@ public class LspMessageHandler
     }
 
     /// <summary>
+    /// 处理 textDocument/didSave 通知，触发诊断刷新以反映保存后的状态。
+    /// 配合 workspace/didChangeConfiguration 实现参考程序集变更后的重新诊断。
+    /// </summary>
+    [JsonRpcMethod("textDocument/didSave")]
+    public void DidSave(JToken token)
+    {
+        var parameters = token.ToObject<DidSaveTextDocumentParams>(Serializer)!;
+        _dispatcher.OnDocumentSaved(parameters.TextDocument.Uri.AbsoluteUri);
+    }
+
+    /// <summary>
+    /// 处理 workspace/didChangeConfiguration 通知，重建架构上下文并刷新诊断。
+    /// 支持 VS Code 扩展在程序集发现完成后通知服务器重新加载参考程序集。
+    /// </summary>
+    [JsonRpcMethod("workspace/didChangeConfiguration")]
+    public void DidChangeConfiguration(JToken token)
+    {
+        var parameters = token.ToObject<DidChangeConfigurationParams>(Serializer);
+        if (parameters?.Settings is JObject settings)
+        {
+            var assemblyPaths = settings["referenceAssemblies"] as JArray;
+            var winSdkRoot = settings["winSdkRoot"]?.Value<string>();
+            if (assemblyPaths != null && assemblyPaths.Count > 0)
+            {
+                var paths = new List<string>();
+                foreach (var pathToken in assemblyPaths)
+                {
+                    var filePath = pathToken.Value<string>();
+                    if (filePath is not null && filePath.Length > 0)
+                        paths.Add(filePath);
+                }
+                _dispatcher.OnReferenceAssembliesDiscovered(paths, winSdkRoot);
+            }
+        }
+    }
+
+    /// <summary>
     /// 处理 LSP shutdown 请求，返回 null 表示服务器接受关闭。
     /// </summary>
     [JsonRpcMethod("shutdown")]

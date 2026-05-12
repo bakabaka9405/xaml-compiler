@@ -69,8 +69,20 @@ public class LspMessageDispatcher
     }
 
     /// <summary>
+    /// 处理文档保存事件：触发诊断刷新以反映保存后的状态。
+    /// 无需更新文档存储（内容未变更），但重新诊断可捕获保存触发的验证结果。
+    /// </summary>
+    /// <param name="uri">文档 URI。</param>
+    public void OnDocumentSaved(string uri)
+    {
+        PublishDiagnostics(uri);
+    }
+
+    /// <summary>
     /// 处理 hover 请求，使用当前 schema 与 XML 文档索引生成悬停内容。
     /// </summary>
+    /// <param name="parameters">悬停请求参数，包含文档 URI 和光标位置。</param>
+    /// <returns>生成的悬停内容，若无匹配内容则返回 null。</returns>
     public Hover? GetHover(TextDocumentPositionParams parameters)
     {
         if (parameters == null)

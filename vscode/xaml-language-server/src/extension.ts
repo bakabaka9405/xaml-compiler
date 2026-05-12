@@ -11,6 +11,44 @@ import {
 } from 'vscode-languageclient/node';
 
 let client: LanguageClient;
+let cachedReferenceAssemblies: string[] = [];
+let cachedWinSdkRoot: string | undefined;
+
+/**
+ * 刷新项目 WinMD 引用列表。
+ *
+ * 在 VS Code workspace 事件（打开/保存 .xaml 文件）触发时调用，
+ * 重新执行 discoverLspContext 检查 build/.gens 下是否出现新的
+ * 项目 WinMD 文件，并将变更通知 LSP 服务端。
+ *
+ * 不依赖 fs.watch / createFileSystemWatcher，
+ * 仅在用户与编辑器交互时按需扫描。
+ */
+async function refreshProjectReferences(workspaceRoot: string): Promise<void> {
+    if (!client) { return; }
+    const lspContext = await discoverLspContext(workspaceRoot);
+    if (!lspContext) { return; }
+
+    const newRefs = lspContext.referenceAssemblies;
+    const hasChanged =
+        newRefs.length !== cachedReferenceAssemblies.length ||
+        !newRefs.every((p, i) => p === cachedReferenceAssemblies[i]);
+
+    if (hasChanged || lspContext.winSdkRoot !== cachedWinSdkRoot) {
+        cachedReferenceAssemblies = newRefs;
+        cachedWinSdkRoot = lspContext.winSdkRoot;
+
+        client.sendNotification('workspace/didChangeConfiguration', {
+            settings: {
+                referenceAssemblies: newRefs,
+                winSdkRoot: lspContext.winSdkRoot,
+                namespace: lspContext.namespace,
+                sourceDir: lspContext.sourceDir,
+            }
+        });
+        console.log(`[XAML LS] Refreshed references: ${newRefs.length} assemblies`);
+    }
+}
 
 /**
  * VS Code 扩展激活入口。
@@ -43,6 +81,8 @@ export async function activate(context: ExtensionContext): Promise<void> {
                 sourceDir: lspContext.sourceDir,
                 winSdkRoot: lspContext.winSdkRoot,
             };
+            cachedReferenceAssemblies = [...lspContext.referenceAssemblies];
+            cachedWinSdkRoot = lspContext.winSdkRoot;
             console.log(
                 `[XAML LS] Discovered ${lspContext.referenceAssemblies.length} reference assemblies`
             );
@@ -106,6 +146,29 @@ export async function activate(context: ExtensionContext): Promise<void> {
 
     await client.start();
     console.log('XAML Language Server started successfully');
+
+    // 注册 .xaml 文件打开/保存事件处理器，按需刷新项目 WinMD 引用
+    context.subscriptions.push(
+        workspace.onDidOpenTextDocument(async (doc) => {
+            if (doc.languageId === 'xml' && doc.fileName.endsWith('.xaml')) {
+                const wsFolder = workspace.getWorkspaceFolder(doc.uri);
+                if (wsFolder) {
+                    await refreshProjectReferences(wsFolder.uri.fsPath);
+                }
+            }
+        })
+    );
+
+    context.subscriptions.push(
+        workspace.onDidSaveTextDocument(async (doc) => {
+            if (doc.languageId === 'xml' && doc.fileName.endsWith('.xaml')) {
+                const wsFolder = workspace.getWorkspaceFolder(doc.uri);
+                if (wsFolder) {
+                    await refreshProjectReferences(wsFolder.uri.fsPath);
+                }
+            }
+        })
+    );
 }
 
 /**
