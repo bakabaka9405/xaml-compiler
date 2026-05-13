@@ -89,6 +89,14 @@ internal class Loader
 		return assembly;
 	}
 
+	public Assembly LoadAssemblyFromByteArray(byte[] data, string filePath)
+	{
+		MetadataFile metadataImport = m_dispenser.OpenFromByteArray(data, filePath);
+		Assembly assembly = AssemblyFactory.CreateAssembly(m_universe, metadataImport, Factory, filePath);
+		m_universe.AddAssembly(assembly);
+		return assembly;
+	}
+
 	public MetadataOnlyModule LoadModuleFromFile(string moduleFileName)
 	{
 		MetadataFile import = m_dispenser.OpenFileAsFileMapping(moduleFileName);

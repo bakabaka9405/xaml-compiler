@@ -18,6 +18,7 @@ public class XamlDiagnosticService
     private readonly XamlParserService _parser;
     private readonly LspDiagnosticCollector _collector;
     private DirectUISchemaContext _schemaContext;
+    private XamlTypeUniverse? _currentTypeUniverse;
 
     /// <summary>
     /// 初始化诊断服务。
@@ -50,8 +51,11 @@ public class XamlDiagnosticService
     /// <summary>
     /// Runtime build of DirectUISchemaContext using WinMD reference assemblies
     /// discovered by the VS Code extension. Supports hot-reload without LSP restart.
-    /// Uses XamlTypeUniverse.LoadAssemblyFromFile() for metadata-only loading
-    /// compatible with the IAssembly2 type system required by DirectUISystem.
+    ///
+    /// Assemblies are loaded from byte arrays (via XamlTypeUniverse.LoadAssemblyFromByteArray)
+    /// so that WinMD file handles are released immediately after reading. This allows
+    /// the build pipeline (xmake/mdmerge) to overwrite merged WinMD outputs without
+    /// sharing violations, regardless of when BuildSchemaContext was last called.
     /// </summary>
     /// <param name="assemblyPaths">Absolute paths to WinMD assembly files.</param>
     /// <param name="winSdkRoot">Windows SDK root directory (optional, for facade filtering).</param>
@@ -80,7 +84,11 @@ public class XamlDiagnosticService
 
             try
             {
-                var asm = typeUniverse.LoadAssemblyFromFile(filePath);
+                // Load from byte array to release the file handle immediately.
+                // The CLR metadata dispenser reads from pinned managed memory,
+                // so no FileMapping or native file handle is held after this call.
+                byte[] data = System.IO.File.ReadAllBytes(filePath);
+                var asm = typeUniverse.LoadAssemblyFromByteArray(data, filePath);
                 loadedAssemblies.Add(asm);
             }
             catch (Exception ex)
@@ -96,20 +104,30 @@ public class XamlDiagnosticService
             $"({skippedCount} missing, {failedCount} failed)");
 
         if (loadedAssemblies.Count == 0)
+        {
+            typeUniverse.Dispose();
             return;
+        }
 
         var typeResolver = new TypeResolver(typeUniverse);
         typeResolver.InitializeTypeNameMap();
 
-        _schemaContext = new DirectUISchemaContext(
+        var newSchemaContext = new DirectUISchemaContext(
             referenceAssemblies: loadedAssemblies,
             systemExtraReferenceItems: new System.Collections.Generic.List<string>(),
             localAssembly: null!,
             staticLibraryAssemblies: null!,
             sdkPath: winSdkRoot ?? string.Empty,
             isStringNullable: false);
+        newSchemaContext.TypeResolver = typeResolver;
+        _schemaContext = newSchemaContext;
 
-        _schemaContext.TypeResolver = typeResolver;
+        // Dispose the old XamlTypeUniverse to release COM metadata objects
+        // and GCHandles promptly. Must happen AFTER _schemaContext replacement
+        // so that in-flight AnalyzeDocument() calls don't touch disposed state.
+        var oldUniverse = _currentTypeUniverse;
+        _currentTypeUniverse = typeUniverse;
+        oldUniverse?.Dispose();
     }
 
     public IReadOnlyList<Diagnostic> AnalyzeDocument(string uri)
@@ -198,6 +216,13 @@ public class XamlDiagnosticService
                         endColumnNumber: warning.LineOffset,
                         message: warning.Message);
                 }
+            }
+            catch (ObjectDisposedException)
+            {
+                // Schema context was replaced during analysis; silently skip this document
+                System.Diagnostics.Debug.WriteLine(
+                    $"Schema context disposed during analysis of {uri}; skipping");
+                return new List<Diagnostic>(_collector.Diagnostics);
             }
             catch (Exception ex)
             {

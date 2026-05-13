@@ -45,10 +45,50 @@ internal class XamlTypeUniverse : SimpleUniverse
 		return _loader.ResolveModule(containingAssembly, moduleName);
 	}
 
-	public Assembly LoadAssemblyFromFile(string path)
-	{
-		string fullPath = Path.GetFullPath(path);
-		Assembly assembly = Loader.ReadAssemblyFromFile(path);
+    /// <summary>
+    /// Load assembly metadata from a byte array without holding any file handle.
+    /// The CLR metadata dispenser reads directly from pinned managed memory,
+    /// so the WinMD source file can be overwritten immediately by build tools.
+    /// </summary>
+    /// <param name="data">Raw PE/COFF bytes of the WinMD file.</param>
+    /// <param name="virtualPath">Original file path, used only for diagnostics
+    /// and assembly identity; no file handle is opened.</param>
+    internal Assembly LoadAssemblyFromByteArray(byte[] data, string virtualPath)
+    {
+        // Uses the fileName-aware overload so that:
+        // 1. MetadataDispenser.OpenFromByteArray creates a FileMapping with the
+        //    real path (enables MetadataFileAndRvaResolver for full RVA support).
+        // 2. AssemblyFactory.CreateAssembly receives the real path as assembly
+        //    Location (enables dedup and module resolution).
+        Assembly assembly = Loader.LoadAssemblyFromByteArray(data, virtualPath);
+
+        // Register in the name cache for ResolveAssembly lookups.
+        // Loader.LoadAssemblyFromByteArray already called m_universe.AddAssembly,
+        // so the assembly is in m_loadedAssemblies. We synchronize _asmNameCache
+        // and system assembly tracking to match LoadAssemblyFromFile.
+        string text = assembly.GetName().FullName;
+        if (!_asmNameCache.ContainsKey(text))
+        {
+            _asmNameCache.Add(text, assembly);
+        }
+
+        if (assembly.GetName().Name.Equals("mscorlib"))
+        {
+            _systemAssembly = assembly;
+            SetSystemAssembly(_systemAssembly);
+        }
+        if (assembly.GetName().Name.Equals("System.Runtime", StringComparison.OrdinalIgnoreCase))
+        {
+            _systemRuntimeAssembly = assembly;
+        }
+
+        return assembly;
+    }
+
+    public Assembly LoadAssemblyFromFile(string path)
+    {
+        string fullPath = Path.GetFullPath(path);
+        Assembly assembly = Loader.ReadAssemblyFromFile(path);
 		string text = assembly.GetName().FullName;
 		Assembly value = null;
 		while (_asmNameCache.TryGetValue(text, out value))

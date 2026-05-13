@@ -6,15 +6,21 @@ namespace System.Reflection.Adds;
 [SecurityPermission(SecurityAction.Demand, UnmanagedCode = true)]
 internal class MetadataDispenser
 {
-	private class MetadataFileOnByteArray : MetadataFile
+	/// <summary>
+	/// Metadata file backed by a pinned byte array with full RVA resolution.
+	/// Wraps a GCHandle-pinned managed array in a FileMapping (no native file
+	/// handles) so that MetadataFileAndRvaResolver can perform PE section
+	/// resolution (ReadEntryPointToken, ReadRva, ReadResource) against the
+	/// in-memory image.
+	/// </summary>
+	private class ByteArrayBackedRvaResolver : MetadataFileAndRvaResolver
 	{
 		private GCHandle m_handle;
 
-		public MetadataFileOnByteArray(ref GCHandle h, IntPtr pUnk)
-			: base(pUnk)
+		public ByteArrayBackedRvaResolver(IntPtr importer, FileMapping file, GCHandle handle, bool disableRangeValidation)
+			: base(importer, file, disableRangeValidation)
 		{
-			m_handle = h;
-			h = default(GCHandle);
+			m_handle = handle;
 		}
 
 		protected override void Dispose(bool disposing)
@@ -106,6 +112,14 @@ internal class MetadataDispenser
 
 	public MetadataFile OpenFromByteArray(byte[] data)
 	{
+		// Use a synthetic path so FileMapping.Path has a non-empty value.
+		// This preserves backward compatibility for callers that don't pass a
+		// file path (e.g. legacy tests or indirect loaders).
+		return OpenFromByteArray(data, "<byte-array>");
+	}
+
+	public MetadataFile OpenFromByteArray(byte[] data, string fileName)
+	{
 		data = (byte[])data.Clone();
 		IMetaDataDispenserEx dispenserShim = GetDispenserShim();
 		Guid riid = typeof(IMetadataImportDummy).GUID;
@@ -121,14 +135,15 @@ internal class MetadataDispenser
 			GC.KeepAlive(dispenserShim);
 			Marshal.FinalReleaseComObject(dispenserShim);
 			dispenserShim = null;
-			return new MetadataFileOnByteArray(ref h, ppIUnk);
+
+			// Wrap the pinned memory in a FileMapping so MetadataFileAndRvaResolver
+			// can resolve PE RVAs. The FileMapping(IntPtr, long, string) constructor
+			// does NOT open any file handles — it only stores the address and length.
+			FileMapping fileMapping = new FileMapping(pData, data.Length, fileName);
+			return new ByteArrayBackedRvaResolver(ppIUnk, fileMapping, h, (m_openFlags & CorOpenFlags.NoTransform) == 0);
 		}
 		finally
 		{
-			if (h.IsAllocated)
-			{
-				h.Free();
-			}
 			if (ppIUnk != IntPtr.Zero)
 			{
 				Marshal.Release(ppIUnk);
