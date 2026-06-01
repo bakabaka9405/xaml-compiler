@@ -88,7 +88,7 @@ public class LspDiagnosticCollector : ILog
         {
             Severity = severity,
             Code = code,
-            Message = message,
+            Message = EscapeDiagnosticMessage(message),
             Range = new Range
             {
                 Start = new Position { Line = startLine, Character = startChar },
@@ -96,5 +96,10 @@ public class LspDiagnosticCollector : ILog
             },
             Source = "XamlCompiler"
         };
+    }
+
+    private static string EscapeDiagnosticMessage(string message)
+    {
+        return message.Replace("\r", "\\r").Replace("\n", "\\n");
     }
 }
