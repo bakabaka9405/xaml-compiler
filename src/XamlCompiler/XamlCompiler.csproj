@@ -16,6 +16,22 @@
   <PropertyGroup>
     <RootNamespace />
   </PropertyGroup>
+  <PropertyGroup>
+    <CodeGenNamespace>Microsoft.UI.Xaml.Markup.Compiler.CodeGen</CodeGenNamespace>
+    <CppWinRTT4TransformFile>Microsoft.UI.Xaml.Markup.Compiler.CodeGen\CppWinRT_*.tt</CppWinRTT4TransformFile>
+    <TextTemplatingTargets Condition="'$(TextTemplatingTargets)' == '' and Exists('$(ProgramFiles)\Microsoft Visual Studio\18\Enterprise\MSBuild\Microsoft\VisualStudio\v18.0\TextTemplating\Microsoft.TextTemplating.targets')">$(ProgramFiles)\Microsoft Visual Studio\18\Enterprise\MSBuild\Microsoft\VisualStudio\v18.0\TextTemplating\Microsoft.TextTemplating.targets</TextTemplatingTargets>
+    <TextTemplatingTargets Condition="'$(TextTemplatingTargets)' == '' and Exists('$(ProgramFiles)\Microsoft Visual Studio\18\Professional\MSBuild\Microsoft\VisualStudio\v18.0\TextTemplating\Microsoft.TextTemplating.targets')">$(ProgramFiles)\Microsoft Visual Studio\18\Professional\MSBuild\Microsoft\VisualStudio\v18.0\TextTemplating\Microsoft.TextTemplating.targets</TextTemplatingTargets>
+    <TextTemplatingTargets Condition="'$(TextTemplatingTargets)' == '' and Exists('$(ProgramFiles)\Microsoft Visual Studio\18\Community\MSBuild\Microsoft\VisualStudio\v18.0\TextTemplating\Microsoft.TextTemplating.targets')">$(ProgramFiles)\Microsoft Visual Studio\18\Community\MSBuild\Microsoft\VisualStudio\v18.0\TextTemplating\Microsoft.TextTemplating.targets</TextTemplatingTargets>
+    <TextTemplatingTargets Condition="'$(TextTemplatingTargets)' == '' and Exists('$(ProgramFiles)\Microsoft Visual Studio\18\BuildTools\MSBuild\Microsoft\VisualStudio\v18.0\TextTemplating\Microsoft.TextTemplating.targets')">$(ProgramFiles)\Microsoft Visual Studio\18\BuildTools\MSBuild\Microsoft\VisualStudio\v18.0\TextTemplating\Microsoft.TextTemplating.targets</TextTemplatingTargets>
+    <VisualStudioMSBuildExe Condition="'$(VisualStudioMSBuildExe)' == '' and Exists('$(ProgramFiles)\Microsoft Visual Studio\18\Enterprise\MSBuild\Current\Bin\MSBuild.exe')">$(ProgramFiles)\Microsoft Visual Studio\18\Enterprise\MSBuild\Current\Bin\MSBuild.exe</VisualStudioMSBuildExe>
+    <VisualStudioMSBuildExe Condition="'$(VisualStudioMSBuildExe)' == '' and Exists('$(ProgramFiles)\Microsoft Visual Studio\18\Professional\MSBuild\Current\Bin\MSBuild.exe')">$(ProgramFiles)\Microsoft Visual Studio\18\Professional\MSBuild\Current\Bin\MSBuild.exe</VisualStudioMSBuildExe>
+    <VisualStudioMSBuildExe Condition="'$(VisualStudioMSBuildExe)' == '' and Exists('$(ProgramFiles)\Microsoft Visual Studio\18\Community\MSBuild\Current\Bin\MSBuild.exe')">$(ProgramFiles)\Microsoft Visual Studio\18\Community\MSBuild\Current\Bin\MSBuild.exe</VisualStudioMSBuildExe>
+    <VisualStudioMSBuildExe Condition="'$(VisualStudioMSBuildExe)' == '' and Exists('$(ProgramFiles)\Microsoft Visual Studio\18\BuildTools\MSBuild\Current\Bin\MSBuild.exe')">$(ProgramFiles)\Microsoft Visual Studio\18\BuildTools\MSBuild\Current\Bin\MSBuild.exe</VisualStudioMSBuildExe>
+    <TransformOnBuild>false</TransformOnBuild>
+    <TransformOutOfDateOnly>false</TransformOutOfDateOnly>
+    <OverwriteReadOnlyOutputFiles>false</OverwriteReadOnlyOutputFiles>
+    <PreprocessTemplateDefaultNamespace>$(CodeGenNamespace)</PreprocessTemplateDefaultNamespace>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System.Xml" />
     <Reference Include="System.Core" />
@@ -29,5 +45,69 @@
     <PackageReference Include="System.Text.Json" Version="8.0.5" />
     <PackageReference Include="Antlr4.Runtime.Standard" Version="4.13.1" />
   </ItemGroup>
+  <ItemGroup>
+    <CppWinRTT4Template Include="Microsoft.UI.Xaml.Markup.Compiler.CodeGen\CppWinRT_AppPass1.tt">
+      <LastGenOutput>CppWinRT_AppPass1.cs</LastGenOutput>
+    </CppWinRTT4Template>
+    <CppWinRTT4Template Include="Microsoft.UI.Xaml.Markup.Compiler.CodeGen\CppWinRT_AppPass2.tt">
+      <LastGenOutput>CppWinRT_AppPass2.cs</LastGenOutput>
+    </CppWinRTT4Template>
+    <CppWinRTT4Template Include="Microsoft.UI.Xaml.Markup.Compiler.CodeGen\CppWinRT_BindingInfoPass1.tt">
+      <LastGenOutput>CppWinRT_BindingInfoPass1.cs</LastGenOutput>
+    </CppWinRTT4Template>
+    <CppWinRTT4Template Include="Microsoft.UI.Xaml.Markup.Compiler.CodeGen\CppWinRT_BindingInfoPass2.tt">
+      <LastGenOutput>CppWinRT_BindingInfoPass2.cs</LastGenOutput>
+    </CppWinRTT4Template>
+    <CppWinRTT4Template Include="Microsoft.UI.Xaml.Markup.Compiler.CodeGen\CppWinRT_MetadataDelegates.tt">
+      <LastGenOutput>CppWinRT_MetadataDelegates.cs</LastGenOutput>
+    </CppWinRTT4Template>
+    <CppWinRTT4Template Include="Microsoft.UI.Xaml.Markup.Compiler.CodeGen\CppWinRT_PageBinding.tt">
+      <LastGenOutput>CppWinRT_PageBinding.cs</LastGenOutput>
+    </CppWinRTT4Template>
+    <CppWinRTT4Template Include="Microsoft.UI.Xaml.Markup.Compiler.CodeGen\CppWinRT_PageBindingTracking.tt">
+      <LastGenOutput>CppWinRT_PageBindingTracking.cs</LastGenOutput>
+    </CppWinRTT4Template>
+    <CppWinRTT4Template Include="Microsoft.UI.Xaml.Markup.Compiler.CodeGen\CppWinRT_PagePass1.tt">
+      <LastGenOutput>CppWinRT_PagePass1.cs</LastGenOutput>
+    </CppWinRTT4Template>
+    <CppWinRTT4Template Include="Microsoft.UI.Xaml.Markup.Compiler.CodeGen\CppWinRT_PagePass2.tt">
+      <LastGenOutput>CppWinRT_PagePass2.cs</LastGenOutput>
+    </CppWinRTT4Template>
+    <CppWinRTT4Template Include="Microsoft.UI.Xaml.Markup.Compiler.CodeGen\CppWinRT_TemplatedMetadataDelegates.tt">
+      <LastGenOutput>CppWinRT_TemplatedMetadataDelegates.cs</LastGenOutput>
+    </CppWinRTT4Template>
+    <CppWinRTT4Template Include="Microsoft.UI.Xaml.Markup.Compiler.CodeGen\CppWinRT_TypeInfoPass1.tt">
+      <LastGenOutput>CppWinRT_TypeInfoPass1.cs</LastGenOutput>
+    </CppWinRTT4Template>
+    <CppWinRTT4Template Include="Microsoft.UI.Xaml.Markup.Compiler.CodeGen\CppWinRT_TypeInfoPass1Impl.tt">
+      <LastGenOutput>CppWinRT_TypeInfoPass1Impl.cs</LastGenOutput>
+    </CppWinRTT4Template>
+    <CppWinRTT4Template Include="Microsoft.UI.Xaml.Markup.Compiler.CodeGen\CppWinRT_TypeInfoPass2.tt">
+      <LastGenOutput>CppWinRT_TypeInfoPass2.cs</LastGenOutput>
+    </CppWinRTT4Template>
+    <CppWinRTT4Template Include="Microsoft.UI.Xaml.Markup.Compiler.CodeGen\CppWinRT_XamlMetaDataProviderPass1.tt">
+      <LastGenOutput>CppWinRT_XamlMetaDataProviderPass1.cs</LastGenOutput>
+    </CppWinRTT4Template>
+    <CppWinRTT4Template Include="Microsoft.UI.Xaml.Markup.Compiler.CodeGen\CppWinRT_XamlMetaDataProviderPass2.tt">
+      <LastGenOutput>CppWinRT_XamlMetaDataProviderPass2.cs</LastGenOutput>
+    </CppWinRTT4Template>
+
+    <None Update="@(CppWinRTT4Template)">
+      <Generator>TextTemplatingFilePreprocessor</Generator>
+      <CustomToolNamespace>$(CodeGenNamespace)</CustomToolNamespace>
+      <LastGenOutput>%(CppWinRTT4Template.LastGenOutput)</LastGenOutput>
+    </None>
+  </ItemGroup>
+
+  <Import Project="$(TextTemplatingTargets)" Condition="Exists('$(TextTemplatingTargets)')" />
+
+  <Target Name="_EnsureTextTemplatingTargets">
+    <Error Condition="'$(TextTemplatingTargets)' == '' or !Exists('$(TextTemplatingTargets)')" Text="Visual Studio TextTemplating targets were not found in the common Visual Studio 2026 locations. Install the Visual Studio TextTemplating component before running RegenerateCppWinRTT4." />
+  </Target>
+
+  <Target Name="RegenerateCppWinRTT4" DependsOnTargets="_EnsureTextTemplatingTargets">
+    <Error Condition="'$(VisualStudioMSBuildExe)' == '' or !Exists('$(VisualStudioMSBuildExe)')" Text="Visual Studio MSBuild.exe was not found in the common Visual Studio 2026 locations. Install Visual Studio MSBuild before running RegenerateCppWinRTT4." />
+    <Exec Command="&quot;$(VisualStudioMSBuildExe)&quot; &quot;$(MSBuildProjectFullPath)&quot; /t:Transform /p:TextTemplatingTargets=&quot;$(TextTemplatingTargets)&quot; /p:TransformFile=&quot;$(CppWinRTT4TransformFile)&quot; /p:TransformOutOfDateOnly=false /p:TransformOnBuild=false" />
+  </Target>
 
 </Project>
